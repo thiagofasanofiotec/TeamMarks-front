@@ -1,0 +1,392 @@
+.admin-container {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e8edf2;
+}
+
+.admin-header {
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #e8edf2;
+  padding-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.admin-header h2 {
+  color: #1a202c;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.admin-subtitle {
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.btn-novo-marco {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.btn-novo-marco:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 3px solid transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  opacity: 0.7;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  opacity: 0.85;
+}
+
+.stat-card.active {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
+  opacity: 1;
+  border-width: 3px;
+}
+
+.stat-card.pendente {
+  background: #fffbeb;
+}
+
+.stat-card.pendente.active {
+  background: #fef3c7;
+  border-color: #f59e0b;
+}
+
+.stat-card.aprovado {
+  background: #f0fdf4;
+}
+
+.stat-card.aprovado.active {
+  background: #d1fae5;
+  border-color: #059669;
+}
+
+.stat-card.rejeitado {
+  background: #fef2f2;
+}
+
+.stat-card.rejeitado.active {
+  background: #fee2e2;
+  border-color: #dc2626;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a202c;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.admin-card {
+  background: #ffffff;
+  border: 1px solid #e8edf2;
+  border-radius: 6px;
+  padding: 1.5rem;
+  transition: box-shadow 0.2s ease;
+}
+
+.admin-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.admin-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.admin-card-header h3 {
+  color: #1a202c;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.status-pendente {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-badge.status-aprovado {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge.status-rejeitado {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.card-date {
+  color: #64748b;
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.card-description {
+  color: #4a5568;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.card-highlights {
+  background: #f0f9ff;
+  border-left: 3px solid #2563eb;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  color: #1e40af;
+}
+
+.card-highlights strong {
+  font-weight: 600;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid #e8edf2;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.card-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.card-user {
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.card-squads {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.squads-label {
+  color: #64748b;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.squad-tag {
+  color: #475569;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.squad-tag:not(:last-child)::after {
+  content: ',';
+  margin-right: 0.25rem;
+}
+
+.card-color {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 2px solid #e8edf2;
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btn-aprovar,
+.btn-rejeitar,
+.btn-editar-admin,
+.btn-excluir-admin {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-aprovar {
+  background: #059669;
+  color: white;
+}
+
+.btn-aprovar:hover:not(:disabled) {
+  background: #047857;
+}
+
+.btn-rejeitar {
+  background: #dc2626;
+  color: white;
+}
+
+.btn-rejeitar:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.btn-editar-admin {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-editar-admin:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.btn-excluir-admin {
+  background: #dc2626;
+  color: white;
+}
+
+.btn-excluir-admin:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.btn-aprovar:disabled,
+.btn-rejeitar:disabled,
+.btn-editar-admin:disabled,
+.btn-excluir-admin:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.empty-list {
+  text-align: center;
+  padding: 3rem;
+  color: #64748b;
+}
+
+.access-denied {
+  text-align: center;
+  padding: 3rem;
+}
+
+.access-denied h2 {
+  color: #dc2626;
+  margin-bottom: 1rem;
+}
+
+.access-denied p {
+  color: #64748b;
+}
+
+@media (max-width: 768px) {
+  .admin-container {
+    padding: 1rem;
+  }
+
+  .admin-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-card-header {
+    flex-direction: column;
+  }
+
+  .card-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .card-actions {
+    width: 100%;
+  }
+
+  .btn-aprovar,
+  .btn-rejeitar {
+    flex: 1;
+  }
+}
