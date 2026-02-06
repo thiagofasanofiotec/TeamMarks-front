@@ -8,7 +8,7 @@
 
 .tv-header {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 1.5rem;
   color: white;
   position: relative;
 }
@@ -55,25 +55,58 @@
   flex-wrap: wrap;
 }
 
-.tv-stats {
+.tv-stats-container {
   display: flex;
   gap: 2rem;
   justify-content: center;
-  font-size: 1.2rem;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
-.tv-total {
-  background: rgba(255, 255, 255, 0.2);
-  padding: 0.5rem 1.5rem;
-  border-radius: 25px;
+.tv-stat-card {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
   backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s ease;
+  min-width: 180px;
 }
 
-.tv-pagination {
+.tv-stat-card:hover {
   background: rgba(255, 255, 255, 0.2);
-  padding: 0.5rem 1.5rem;
-  border-radius: 25px;
-  backdrop-filter: blur(10px);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.tv-stat-icon {
+  font-size: 2rem;
+  line-height: 1;
+  opacity: 0.9;
+}
+
+.tv-stat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.tv-stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: white;
+  line-height: 1;
+}
+
+.tv-stat-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 .tv-content {
@@ -200,25 +233,6 @@
 .tv-squads-value,
 .tv-customer-value {
   color: #1e293b;
-}
-
-.tv-indicators {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-}
-
-.tv-indicator {
-  width: 60px;
-  height: 8px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 10px;
-  transition: all 0.3s ease;
-}
-
-.tv-indicator.active {
-  background: white;
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.5);
 }
 
 .tv-empty-state {

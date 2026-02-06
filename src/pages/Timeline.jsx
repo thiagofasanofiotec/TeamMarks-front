@@ -573,7 +573,7 @@ function Timeline() {
                       }}
                     >
                       <div className="timeline-icon-large" style={{ 
-                        backgroundColor: marco.typeId === 1 ? '#2563eb' : marco.typeId === 2 ? '#059669' : '#dc2626' 
+                        backgroundColor: '#2563eb'
                       }}>
                         {marco.typeId === 1 ? '🖥️' : marco.typeId === 2 ? '⚙️' : '🔒'}
                       </div>
@@ -595,7 +595,6 @@ function Timeline() {
                 const resumo = gerarResumoIA()
                 const dadosGrafico = prepararDadosGrafico()
                 const dadosSquads = prepararDadosSquadsPorMes()
-                const dadosAreas = prepararDadosEntregasPorArea()
                 return (
                   <div className="resumo-ia-container">
                     <div className="numeros-section">
@@ -682,66 +681,6 @@ function Timeline() {
                         </ResponsiveContainer>
                       </div>
                     </div>
-
-                    <div className="grafico-section">
-                      <h4>🏢 Entregas por Área</h4>
-                      <div className="grafico-container">
-                        <ResponsiveContainer width="100%" height={400}>
-                          <BarChart
-                            data={dadosAreas}
-                            margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
-                            layout="horizontal"
-                          >
-                            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                            <XAxis 
-                              dataKey="area" 
-                              angle={-45}
-                              textAnchor="end"
-                              height={100}
-                              tick={{ fill: '#64748b', fontSize: 12 }}
-                            />
-                            <YAxis 
-                              tick={{ fill: '#64748b', fontSize: 12 }}
-                              allowDecimals={false}
-                            />
-                            <Tooltip 
-                              contentStyle={{
-                                backgroundColor: '#ffffff',
-                                border: '1px solid #e2e8f0',
-                                borderRadius: '8px',
-                                boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-                              }}
-                              labelStyle={{ color: '#1e293b', fontWeight: 'bold' }}
-                            />
-                            <Legend 
-                              wrapperStyle={{ paddingTop: '20px' }}
-                              iconType="square"
-                            />
-                            <Bar 
-                              dataKey="sistemas" 
-                              name="Sistemas" 
-                              fill="#2563eb" 
-                              radius={[8, 8, 0, 0]}
-                              stackId="stack"
-                            />
-                            <Bar 
-                              dataKey="infra" 
-                              name="Infra" 
-                              fill="#059669" 
-                              radius={[8, 8, 0, 0]}
-                              stackId="stack"
-                            />
-                            <Bar 
-                              dataKey="devsecops" 
-                              name="DevSecops" 
-                              fill="#dc2626" 
-                              radius={[8, 8, 0, 0]}
-                              stackId="stack"
-                            />
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </div>
                   </div>
                 )
               })()}
@@ -821,12 +760,12 @@ function Timeline() {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <button className="modal-close" onClick={fecharModal}>×</button>
             <div className="modal-header" style={{ 
-              borderTopColor: marcoSelecionado.typeId === 1 ? '#2563eb' : marcoSelecionado.typeId === 2 ? '#059669' : '#dc2626' 
+              borderTopColor: '#2563eb'
             }}>
               <h2>{marcoSelecionado.titulo}</h2>
               <div className="modal-meta">
                 <span className="modal-type-badge" style={{ 
-                  backgroundColor: marcoSelecionado.typeId === 1 ? '#2563eb' : marcoSelecionado.typeId === 2 ? '#059669' : '#dc2626' 
+                  backgroundColor: '#2563eb'
                 }}>
                   {marcoSelecionado.typeId === 1 ? '🖥️ Sistemas' : marcoSelecionado.typeId === 2 ? '⚙️ Infra' : '🔒 DevSecops'}
                 </span>
@@ -845,13 +784,6 @@ function Timeline() {
                   <div className="modal-highlights">
                     <p className="highlights-content" style={{ whiteSpace: 'pre-wrap' }}>{limparHTML(marcoSelecionado.highlights)}</p>
                   </div>
-                </div>
-              )}
-              
-              {marcoSelecionado.customer && (
-                <div className="modal-section">
-                  <h4 className="modal-section-title">Área Fim</h4>
-                  <p className="modal-description">{marcoSelecionado.customer}</p>
                 </div>
               )}
               

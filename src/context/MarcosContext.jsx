@@ -43,8 +43,8 @@ export const MarcosProvider = ({ children }) => {
       }))
       setMarcos(marcosFormatados)
     } catch (err) {
-      console.error('Erro ao carregar marcos:', err)
-      setError('Erro ao carregar marcos')
+      console.error('Erro ao carregar entregas:', err)
+      setError('Erro ao carregar entregas')
     } finally {
       setLoading(false)
     }

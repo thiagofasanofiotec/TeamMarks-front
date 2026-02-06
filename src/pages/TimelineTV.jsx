@@ -104,9 +104,14 @@ function TimelineTV() {
         <h1>📊 Timeline de Entregas TI</h1>
         
         <div className="tv-controls">
-          <div className="tv-stats">
-            <span className="tv-total">{marcosAprovados.length} entregas</span>
-            <span className="tv-pagination">{totalSlides > 0 ? `${currentSlide + 1} / ${totalSlides}` : '0 / 0'}</span>
+          <div className="tv-stats-container">
+            <div className="tv-stat-card">
+              <div className="tv-stat-icon">🎯</div>
+              <div className="tv-stat-content">
+                <div className="tv-stat-value">{marcosAprovados.length}</div>
+                <div className="tv-stat-label">Total de Entregas</div>
+              </div>
+            </div>
           </div>
         </div>
         
@@ -159,23 +164,7 @@ function TimelineTV() {
                   <span className="tv-squads-value">{marco.squads}</span>
                 </div>
               )}
-
-              {marco.customer && (
-                <div className="tv-customer">
-                  <span className="tv-customer-label">🎯 Área:</span>
-                  <span className="tv-customer-value">{marco.customer}</span>
-                </div>
-              )}
             </div>
-          ))}
-        </div>
-
-        <div className="tv-indicators">
-          {Array.from({ length: totalSlides }).map((_, index) => (
-            <div 
-              key={index}
-              className={`tv-indicator ${index === currentSlide ? 'active' : ''}`}
-            />
           ))}
         </div>
           </>

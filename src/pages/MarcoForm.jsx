@@ -20,7 +20,6 @@ function MarcoForm() {
     data: new Date().toISOString().split('T')[0],
     typeId: 1, // Sistemas por padrão
     statusId: 1, // Status pendente por padrão
-    customer: '', // Área fim como texto
     applicant: '', // Aplicação
     highlighted: false // Marco em destaque
   })
@@ -63,7 +62,6 @@ function MarcoForm() {
           typeId: marco.typeId || 1,
           statusId: marco.statusId || 1,
           squads: marco.squad || marco.squads || '', // API retorna squad como string
-          customer: marco.customer || '',
           applicant: marco.applicant || '',
           highlighted: marco.highlighted || false
         }))
@@ -108,10 +106,6 @@ function MarcoForm() {
     if (!formData.squads || !formData.squads.trim()) {
       newErrors.squads = 'Informe pelo menos um squad'
     }
-    
-    if (!formData.customer || !formData.customer.trim()) {
-      newErrors.customer = 'Informe a área fim'
-    }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -137,7 +131,6 @@ function MarcoForm() {
         typeId: formData.typeId,
         statusId: formData.statusId,
         squad: formData.squads, // String com squads separados por vírgula
-        customer: formData.customer, // Área fim
         applicant: formData.applicant, // Aplicação
         highlighted: formData.highlighted === true // Boolean
       }
@@ -253,21 +246,6 @@ function MarcoForm() {
             placeholder="Principais conquistas e destaques (opcional)..."
             rows="3"
           />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="customer">Área Fim *</label>
-          <small className="form-hint">Informe a área de negócio beneficiada</small>
-          <input
-            type="text"
-            id="customer"
-            name="customer"
-            value={formData.customer}
-            onChange={handleChange}
-            placeholder="Ex: Diretoria de TI, Área de Compras..."
-            className={errors.customer ? 'error' : ''}
-          />
-          {errors.customer && <span className="error-message">{errors.customer}</span>}
         </div>
 
         <div className="form-group">
