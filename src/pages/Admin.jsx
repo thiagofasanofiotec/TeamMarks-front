@@ -17,6 +17,18 @@ function Admin() {
     carregarMarcos()
   }, [])
 
+  const limparHTML = (html) => {
+    if (!html) return ''
+    return html
+      .replace(/<[^>]*>/g, '') // Remove todas as tags HTML
+      .replace(/&nbsp;/g, ' ') // Substitui &nbsp; por espaço
+      .replace(/&amp;/g, '&') // Substitui &amp; por &
+      .replace(/&lt;/g, '<') // Substitui &lt; por <
+      .replace(/&gt;/g, '>') // Substitui &gt; por >
+      .replace(/&quot;/g, '"') // Substitui &quot; por "
+      .trim()
+  }
+
   const getStatusLabel = (statusId) => {
     const labels = {
       1: 'Pendente',
@@ -28,16 +40,18 @@ function Admin() {
 
   const getTypeLabel = (typeId) => {
     const labels = {
-      1: 'Projeto',
-      2: 'Melhoria'
+      1: 'Sistemas',
+      2: 'Infra',
+      3: 'DevSecops'
     }
     return labels[typeId] || 'Desconhecido'
   }
 
   const getTypeIcon = (typeId) => {
     const icons = {
-      1: '📦',
-      2: '⚡'
+      1: '🖥️',
+      2: '⚙️',
+      3: '🔒'
     }
     return icons[typeId] || '📌'
   }
@@ -205,7 +219,9 @@ function Admin() {
                     <span className={`status-badge ${getStatusClass(marco.statusId)}`}>
                       {getStatusLabel(marco.statusId)}
                     </span>
-                    <span className="type-badge" style={{ backgroundColor: marco.cor }}>
+                    <span className="type-badge" style={{ 
+                      backgroundColor: marco.typeId === 1 ? '#2563eb' : marco.typeId === 2 ? '#059669' : '#dc2626' 
+                    }}>
                       {getTypeIcon(marco.typeId)} {getTypeLabel(marco.typeId)}
                     </span>
                   </div>
@@ -213,29 +229,29 @@ function Admin() {
                 <span className="card-date">{formatarData(marco.data)}</span>
               </div>
               
-              <p className="card-description">{marco.descricao}</p>
+              <p className="card-description" style={{ whiteSpace: 'pre-wrap' }}>{limparHTML(marco.descricao)}</p>
               
               {marco.highlights && (
                 <div className="card-highlights">
-                  <strong>Destaques:</strong> {marco.highlights}
+                  <strong>Destaques:</strong> <span style={{ whiteSpace: 'pre-wrap' }}>{limparHTML(marco.highlights)}</span>
                 </div>
               )}
               
               <div className="card-footer">
                 <div className="card-info">
-                  {marco.squads && marco.squads.length > 0 && (
+                  {marco.squads && marco.squads.trim() && (
                     <div className="card-squads">
                       <span className="squads-label">👥 Squads:</span>
-                      {marco.squads.map((squad, index) => (
-                        <span key={index} className="squad-tag">{squad.name}</span>
+                      {marco.squads.split(',').map((squad, index) => (
+                        <span key={index} className="squad-tag">{squad.trim()}</span>
                       ))}
                     </div>
                   )}
                 </div>
                 
                 <div className="card-actions">
-                  {/* Botão de Editar sempre visível para aprovados */}
-                  {marco.statusId === 2 && (
+                  {/* Botão de Editar visível para pendentes e aprovados */}
+                  {(marco.statusId === 1 || marco.statusId === 2) && (
                     <button 
                       onClick={() => handleEditar(marco.id)}
                       className="btn-editar-admin"
@@ -245,8 +261,8 @@ function Admin() {
                     </button>
                   )}
                   
-                  {/* Botão de Excluir sempre visível para aprovados */}
-                  {marco.statusId === 2 && (
+                  {/* Botão de Excluir visível apenas para rejeitados */}
+                  {marco.statusId === 3 && (
                     <button 
                       onClick={() => handleExcluir(marco)}
                       className="btn-excluir-admin"
@@ -275,17 +291,6 @@ function Admin() {
                       disabled={processando === marco.id}
                     >
                       {processando === marco.id ? 'Processando...' : '✗ Rejeitar'}
-                    </button>
-                  )}
-                  
-                  {/* Botão de Excluir para rejeitados */}
-                  {marco.statusId === 3 && (
-                    <button 
-                      onClick={() => handleExcluir(marco)}
-                      className="btn-excluir-admin"
-                      disabled={processando === marco.id}
-                    >
-                      {processando === marco.id ? 'Excluindo...' : '🗑️ Excluir'}
                     </button>
                   )}
                 </div>

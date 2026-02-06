@@ -35,11 +35,10 @@ export const MarcosProvider = ({ children }) => {
         statusId: goal.statusId,
         typeId: goal.typeId,
         userId: goal.userId,
-        squadIds: Array.isArray(goal.squads) ? goal.squads.map(s => s.id) : [],
-        squads: goal.squads || [],
-        customerId: goal.customerId,
-        customerName: goal.customerName,
-        customerFeedback: goal.customerFeedback || ''
+        squad: goal.squad || '', // String
+        squads: goal.squad || '', // String
+        customer: goal.customer || '',
+        highlighted: goal.highlighted || false
       }))
       setMarcos(marcosFormatados)
     } catch (err) {
@@ -55,35 +54,23 @@ export const MarcosProvider = ({ children }) => {
   }, [])
 
   const getColorByType = (typeId) => {
-    const colors = {
-      1: '#2563eb', // Projeto - Azul
-      2: '#059669', // Melhoria - Verde
-    }
-    return colors[typeId] || '#64748b'
+    // Todos os tipos usam a mesma cor azul
+    return '#2563eb'
   }
 
   const adicionarMarco = async (marco) => {
     setLoading(true)
     setError(null)
     try {
-      const goalData = {
-        typeId: marco.typeId || 1,
-        statusId: marco.statusId || 1,
-        userId: user?.id || 1,
-        title: marco.titulo,
-        description: marco.descricao,
-        applicant: (marco.typeId === 2 || marco.typeId === '2') && marco.sistema ? marco.sistema : (marco.usuario || ''),
-        highlights: marco.highlights || '',
-        squadIds: Array.isArray(marco.squadIds) ? marco.squadIds : [],
-        deliveryAt: marco.data ? new Date(marco.data).toISOString() : new Date().toISOString(),
-        customerId: marco.customerId ? parseInt(marco.customerId) : null,
-        customerFeedback: marco.customerFeedback || ''
-      }
-      
-      await goalService.create(goalData)
+      console.log('MarcosContext.adicionarMarco - Iniciando com dados:', marco)
+      const response = await goalService.create(marco)
+      console.log('MarcosContext.adicionarMarco - Sucesso! Response:', response)
       await carregarMarcos()
+      console.log('MarcosContext.adicionarMarco - Marcos recarregados')
+      return response
     } catch (err) {
-      console.error('Erro ao adicionar marco:', err)
+      console.error('MarcosContext.adicionarMarco - ERRO:', err)
+      console.error('MarcosContext.adicionarMarco - Detalhes do erro:', err.response)
       setError('Erro ao adicionar marco')
       throw err
     } finally {
@@ -97,17 +84,7 @@ export const MarcosProvider = ({ children }) => {
     try {
       const goalData = {
         id: parseInt(id),
-        typeId: marcoAtualizado.typeId || 1,
-        statusId: marcoAtualizado.statusId || 1,
-        userId: marcoAtualizado.userId || user?.id || 1,
-        title: marcoAtualizado.titulo,
-        description: marcoAtualizado.descricao,
-        applicant: (marcoAtualizado.typeId === 2 || marcoAtualizado.typeId === '2') && marcoAtualizado.sistema ? marcoAtualizado.sistema : (marcoAtualizado.usuario || ''),
-        highlights: marcoAtualizado.highlights || '',
-        squadIds: Array.isArray(marcoAtualizado.squadIds) ? marcoAtualizado.squadIds : [],
-        deliveryAt: marcoAtualizado.data ? new Date(marcoAtualizado.data).toISOString() : new Date().toISOString(),
-        customerId: marcoAtualizado.customerId ? parseInt(marcoAtualizado.customerId) : null,
-        customerFeedback: marcoAtualizado.customerFeedback || ''
+        ...marcoAtualizado
       }
       
       console.log('Enviando dados para atualização:', goalData)

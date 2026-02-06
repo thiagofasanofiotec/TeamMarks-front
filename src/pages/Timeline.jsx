@@ -13,7 +13,7 @@ function Timeline() {
   const navigate = useNavigate()
   const [modalAberto, setModalAberto] = useState(false)
   const [marcoSelecionado, setMarcoSelecionado] = useState(null)
-  const [filtroTipo, setFiltroTipo] = useState(null) // null = todos, 1 = projeto, 2 = melhoria
+  const [filtroTipo, setFiltroTipo] = useState(null) // null = todos, 1 = sistemas, 2 = infra, 3 = devsecops
   const [visualizacao, setVisualizacao] = useState('timeline') // 'timeline', 'resumo' ou 'insights'
   const [perguntaSelecionada, setPerguntaSelecionada] = useState(null)
   const [loadingGPT, setLoadingGPT] = useState(false)
@@ -83,8 +83,22 @@ function Timeline() {
 
   const truncarDescricao = (texto, limite = 200) => {
     if (!texto) return ''
-    if (texto.length <= limite) return texto
-    return texto.substring(0, limite) + '...'
+    // Remove tags HTML
+    const textoLimpo = limparHTML(texto)
+    if (textoLimpo.length <= limite) return textoLimpo
+    return textoLimpo.substring(0, limite) + '...'
+  }
+
+  const limparHTML = (html) => {
+    if (!html) return ''
+    return html
+      .replace(/<[^>]*>/g, '') // Remove todas as tags HTML
+      .replace(/&nbsp;/g, ' ') // Substitui &nbsp; por espaço
+      .replace(/&amp;/g, '&') // Substitui &amp; por &
+      .replace(/&lt;/g, '<') // Substitui &lt; por <
+      .replace(/&gt;/g, '>') // Substitui &gt; por >
+      .replace(/&quot;/g, '"') // Substitui &quot; por "
+      .trim()
   }
 
   const abrirModal = (marco) => {
@@ -258,8 +272,9 @@ function Timeline() {
 
   const gerarResumoIA = () => {
     const totalMarcos = marcosFiltrados.length
-    const projetos = marcosFiltrados.filter(m => m.typeId === 1).length
-    const melhorias = marcosFiltrados.filter(m => m.typeId === 2).length
+    const sistemas = marcosFiltrados.filter(m => m.typeId === 1).length
+    const infra = marcosFiltrados.filter(m => m.typeId === 2).length
+    const devsecops = marcosFiltrados.filter(m => m.typeId === 3).length
     
     // Agrupa por mês
     const marcosPorMes = {}
@@ -276,21 +291,22 @@ function Timeline() {
     // Gera apenas conclusão e perspectivas
     let resumoTexto = ``
     
-    if (projetos > melhorias) {
-      resumoTexto += `O portfólio analisado revela uma equipe orientada para transformação e inovação estrutural. O foco predominante em projetos estruturantes indica investimento estratégico em iniciativas de alto impacto, capazes de remodelar processos, sistemas ou capacidades organizacionais. Este perfil sugere uma organização em fase de evolução acelerada, construindo bases para escalabilidade futura. A continuidade deste padrão pode gerar vantagens competitivas sustentáveis e posicionamento diferenciado no mercado.\n\n`
-    } else if (melhorias > projetos) {
-      resumoTexto += `A análise evidencia uma cultura organizacional de excelência operacional, onde a melhoria contínua é prática sistemática e não apenas retórica. A predominância de melhorias contínuas demonstra maturidade processual e compromisso com refinamento constante. Este modelo de atuação, inspirado em metodologias como Lean e Six Sigma, gera ganhos incrementais que, acumulados, produzem transformações significativas. A sustentação desta abordagem pode resultar em eficiência operacional superior e qualidade consistentemente elevada.\n\n`
-    } else {
-      resumoTexto += `O equilíbrio estratégico identificado entre projetos estruturantes e melhorias contínuas representa um modelo de gestão maduro e sofisticado. A equipe demonstra capacidade de atuar simultaneamente em frentes de inovação disruptiva e otimização incremental, maximizando valor através de múltiplas alavancas. Esta dualidade permite construir o futuro enquanto aperfeiçoa o presente, característica de organizações de alto desempenho. A manutenção deste equilíbrio pode proporcionar crescimento sustentável com excelência operacional contínua.\n\n`
-    }
+    const distribuicao = [
+      { tipo: 'Sistemas', qtd: sistemas },
+      { tipo: 'Infra', qtd: infra },
+      { tipo: 'DevSecops', qtd: devsecops }
+    ].sort((a, b) => b.qtd - a.qtd)
+    
+    resumoTexto += `O portfólio analisado revela uma equipe com foco estratégico bem definido. A distribuição das entregas entre Sistemas (${sistemas}), Infraestrutura (${infra}) e DevSecops (${devsecops}) demonstra uma abordagem equilibrada que abrange desenvolvimento, operações e segurança. Este perfil multifacetado indica maturidade organizacional e capacidade de atender diferentes frentes simultaneamente.\n\n`
     
     resumoTexto += `Os ${totalMarcos} marcos alcançados não representam apenas entregas isoladas, mas sim um portfólio coerente que reflete estratégia, disciplina e competência técnica. Cada marco contribui para um mosaico maior de evolução organizacional, e a análise conjunta revela padrões que podem orientar decisões futuras, alocação de recursos e definição de prioridades. A trajetória demonstrada estabelece precedentes positivos e fornece fundamentos sólidos para desafios futuros de maior complexidade e escopo.`
     
     return {
       numeros: {
         total: totalMarcos,
-        projetos: projetos,
-        melhorias: melhorias,
+        sistemas: sistemas,
+        infra: infra,
+        devsecops: devsecops,
         meses: mesesAtivos,
         mediaMensal: mediaMarcosPorMes,
         mesDestaque: mesComMaisMarcos ? mesComMaisMarcos[0] : null,
@@ -312,8 +328,9 @@ function Timeline() {
       if (!marcosPorMes[chave]) {
         marcosPorMes[chave] = {
           mes: mesAno.charAt(0).toUpperCase() + mesAno.slice(1),
-          projetos: 0,
-          melhorias: 0,
+          sistemas: 0,
+          infra: 0,
+          devsecops: 0,
           total: 0,
           ordem: data.getTime()
         }
@@ -322,9 +339,11 @@ function Timeline() {
       marcosPorMes[chave].total += 1
       
       if (marco.typeId === 1) {
-        marcosPorMes[chave].projetos += 1
+        marcosPorMes[chave].sistemas += 1
       } else if (marco.typeId === 2) {
-        marcosPorMes[chave].melhorias += 1
+        marcosPorMes[chave].infra += 1
+      } else if (marco.typeId === 3) {
+        marcosPorMes[chave].devsecops += 1
       }
     })
     
@@ -350,9 +369,11 @@ function Timeline() {
       }
       
       // Processa squads do marco
-      if (marco.squads && Array.isArray(marco.squads)) {
-        marco.squads.forEach(squad => {
-          const squadName = squad.name || 'Sem Squad'
+      const squadsString = marco.squad || marco.squads || '' // API pode retornar squad
+      if (squadsString && typeof squadsString === 'string' && squadsString.trim()) {
+        // Divide squads por vírgula e processa cada um
+        const squadsList = squadsString.split(',').map(s => s.trim()).filter(s => s)
+        squadsList.forEach(squadName => {
           squadsUnicas.add(squadName)
           
           if (!dadosPorMes[chave][squadName]) {
@@ -389,13 +410,14 @@ function Timeline() {
     const entregasPorArea = {}
     
     marcosFiltrados.forEach(marco => {
-      const areaName = marco.customerName || 'Sem Área'
+      const areaName = marco.customer || 'Sem Área'
       
       if (!entregasPorArea[areaName]) {
         entregasPorArea[areaName] = {
           area: areaName,
-          projetos: 0,
-          melhorias: 0,
+          sistemas: 0,
+          infra: 0,
+          devsecops: 0,
           total: 0
         }
       }
@@ -403,9 +425,11 @@ function Timeline() {
       entregasPorArea[areaName].total += 1
       
       if (marco.typeId === 1) {
-        entregasPorArea[areaName].projetos += 1
+        entregasPorArea[areaName].sistemas += 1
       } else if (marco.typeId === 2) {
-        entregasPorArea[areaName].melhorias += 1
+        entregasPorArea[areaName].infra += 1
+      } else if (marco.typeId === 3) {
+        entregasPorArea[areaName].devsecops += 1
       }
     })
     
@@ -442,28 +466,18 @@ function Timeline() {
       
       {visualizacao === 'timeline' && (
         <div className="timeline-filters">
-          <div className="timeline-legenda">
-            <div 
-              className={`legenda-item ${filtroTipo === null ? 'active' : ''}`}
-              onClick={() => toggleFiltro(null)}
+          <div className="filter-select-container">
+            <select 
+              id="filtro-tipo"
+              value={filtroTipo === null ? 'todos' : filtroTipo}
+              onChange={(e) => toggleFiltro(e.target.value === 'todos' ? null : parseInt(e.target.value))}
+              className="tipo-filter-select"
             >
-              <span className="legenda-icon" style={{ backgroundColor: '#6b7280' }}>📋</span>
-              <span>Todos ({marcosAprovados.length})</span>
-            </div>
-            <div 
-              className={`legenda-item ${filtroTipo === 1 ? 'active' : ''}`}
-              onClick={() => toggleFiltro(1)}
-            >
-              <span className="legenda-icon" style={{ backgroundColor: '#2563eb' }}>📦</span>
-              <span>Projeto ({marcosAprovados.filter(m => m.typeId === 1).length})</span>
-            </div>
-            <div 
-              className={`legenda-item ${filtroTipo === 2 ? 'active' : ''}`}
-              onClick={() => toggleFiltro(2)}
-            >
-              <span className="legenda-icon" style={{ backgroundColor: '#059669' }}>⚡</span>
-              <span>Melhoria ({marcosAprovados.filter(m => m.typeId === 2).length})</span>
-            </div>
+              <option value="todos">📋 Todos ({marcosAprovados.length})</option>
+              <option value="1">🖥️ Sistemas ({marcosAprovados.filter(m => m.typeId === 1).length})</option>
+              <option value="2">⚙️ Infra ({marcosAprovados.filter(m => m.typeId === 2).length})</option>
+              <option value="3">🔒 DevSecops ({marcosAprovados.filter(m => m.typeId === 3).length})</option>
+            </select>
           </div>
           <button 
             className="btn-adicionar-entrega"
@@ -513,17 +527,19 @@ function Timeline() {
                   >
                     <div 
                       className="timeline-dot" 
-                      style={{ borderColor: marco.typeId === 1 ? '#2563eb' : '#059669' }}
+                      style={{ borderColor: '#2563eb' }}
                     ></div>
                     <div 
-                      className="timeline-card-vertical" 
+                      className={`timeline-card-vertical ${marco.highlighted ? 'highlighted' : ''}`}
                       style={{ 
-                        borderLeftColor: index % 2 === 0 ? marco.cor : '#e8edf2',
-                        borderRightColor: index % 2 === 0 ? '#e8edf2' : marco.cor
+                        borderLeftColor: marco.highlighted ? '#fbbf24' : (index % 2 === 0 ? marco.cor : '#e8edf2'),
+                        borderRightColor: marco.highlighted ? '#fbbf24' : (index % 2 === 0 ? '#e8edf2' : marco.cor)
                       }}
                     >
-                      <div className="timeline-icon-large" style={{ backgroundColor: marco.cor }}>
-                        {marco.typeId === 1 ? '📦' : '⚡'}
+                      <div className="timeline-icon-large" style={{ 
+                        backgroundColor: marco.typeId === 1 ? '#2563eb' : marco.typeId === 2 ? '#059669' : '#dc2626' 
+                      }}>
+                        {marco.typeId === 1 ? '🖥️' : marco.typeId === 2 ? '⚙️' : '🔒'}
                       </div>
                       <div className="timeline-content-wrapper">
                         <div className="timeline-date-vertical">{formatarData(marco.data)}</div>
@@ -553,17 +569,22 @@ function Timeline() {
                           <div className="numero-valor">{resumo.numeros.total}</div>
                           <div className="numero-label">Total de Entregas</div>
                         </div>
-                        <div className="numero-card projeto">
-                          <div className="numero-valor">{resumo.numeros.projetos}</div>
-                          <div className="numero-label">Projetos</div>
-                          <div className="numero-percent">{((resumo.numeros.projetos/resumo.numeros.total)*100).toFixed(0)}%</div>
+                        <div className="numero-card sistemas">
+                          <div className="numero-valor">{resumo.numeros.sistemas}</div>
+                          <div className="numero-label">Sistemas 💻</div>
+                          <div className="numero-percent">{((resumo.numeros.sistemas/resumo.numeros.total)*100).toFixed(0)}%</div>
                         </div>
-                        <div className="numero-card melhoria">
-                          <div className="numero-valor">{resumo.numeros.melhorias}</div>
-                          <div className="numero-label">Melhorias</div>
-                          <div className="numero-percent">{((resumo.numeros.melhorias/resumo.numeros.total)*100).toFixed(0)}%</div>
+                        <div className="numero-card infra">
+                          <div className="numero-valor">{resumo.numeros.infra}</div>
+                          <div className="numero-label">Infra ⚙️</div>
+                          <div className="numero-percent">{((resumo.numeros.infra/resumo.numeros.total)*100).toFixed(0)}%</div>
                         </div>
-                        <div className="numero-card destaque">
+                        <div className="numero-card devsecops">
+                          <div className="numero-valor">{resumo.numeros.devsecops}</div>
+                          <div className="numero-label">DevSecops 🔒</div>
+                          <div className="numero-percent">{((resumo.numeros.devsecops/resumo.numeros.total)*100).toFixed(0)}%</div>
+                        </div>
+                        <div className="numero-card">
                           <div className="numero-valor">{resumo.numeros.mediaMensal}</div>
                           <div className="numero-label">Média Mensal</div>
                         </div>
@@ -604,15 +625,21 @@ function Timeline() {
                               iconType="square"
                             />
                             <Bar 
-                              dataKey="projetos" 
-                              name="Projetos" 
+                              dataKey="sistemas" 
+                              name="Sistemas" 
                               fill="#2563eb" 
                               radius={[8, 8, 0, 0]}
                             />
                             <Bar 
-                              dataKey="melhorias" 
-                              name="Melhorias" 
+                              dataKey="infra" 
+                              name="Infra" 
                               fill="#059669" 
+                              radius={[8, 8, 0, 0]}
+                            />
+                            <Bar 
+                              dataKey="devsecops" 
+                              name="DevSecops" 
+                              fill="#dc2626" 
                               radius={[8, 8, 0, 0]}
                             />
                           </BarChart>
@@ -655,16 +682,23 @@ function Timeline() {
                               iconType="square"
                             />
                             <Bar 
-                              dataKey="projetos" 
-                              name="Projetos" 
+                              dataKey="sistemas" 
+                              name="Sistemas" 
                               fill="#2563eb" 
                               radius={[8, 8, 0, 0]}
                               stackId="stack"
                             />
                             <Bar 
-                              dataKey="melhorias" 
-                              name="Melhorias" 
+                              dataKey="infra" 
+                              name="Infra" 
                               fill="#059669" 
+                              radius={[8, 8, 0, 0]}
+                              stackId="stack"
+                            />
+                            <Bar 
+                              dataKey="devsecops" 
+                              name="DevSecops" 
+                              fill="#dc2626" 
                               radius={[8, 8, 0, 0]}
                               stackId="stack"
                             />
@@ -696,15 +730,6 @@ function Timeline() {
                       
                       <div className="gpt-buttons-grid">
                         <button 
-                          className={`gpt-button ${perguntaSelecionada === 'analise-executiva' ? 'active' : ''}`}
-                          onClick={() => handlePerguntaGPT('analise-executiva')}
-                          disabled={loadingGPT}
-                        >
-                          <span className="gpt-icon">📈</span>
-                          <span className="gpt-text">Análise da performance</span>
-                        </button>
-                        
-                        <button 
                           className={`gpt-button ${perguntaSelecionada === 'resumo-executivo' ? 'active' : ''}`}
                           onClick={() => handlePerguntaGPT('resumo-executivo')}
                           disabled={loadingGPT}
@@ -714,39 +739,12 @@ function Timeline() {
                         </button>
                         
                         <button 
-                          className={`gpt-button ${perguntaSelecionada === 'principais-padroes' ? 'active' : ''}`}
-                          onClick={() => handlePerguntaGPT('principais-padroes')}
+                          className={`gpt-button ${perguntaSelecionada === 'analise-executiva' ? 'active' : ''}`}
+                          onClick={() => handlePerguntaGPT('analise-executiva')}
                           disabled={loadingGPT}
                         >
-                          <span className="gpt-icon">📊</span>
-                          <span className="gpt-text">Principais padrões</span>
-                        </button>
-                        
-                        <button 
-                          className={`gpt-button ${perguntaSelecionada === 'sistemas-mais-entregas' ? 'active' : ''}`}
-                          onClick={() => handlePerguntaGPT('sistemas-mais-entregas')}
-                          disabled={loadingGPT}
-                        >
-                          <span className="gpt-icon">💻</span>
-                          <span className="gpt-text">Sistemas com mais entregas</span>
-                        </button>
-                        
-                        <button 
-                          className={`gpt-button ${perguntaSelecionada === 'squads-mais-entregas' ? 'active' : ''}`}
-                          onClick={() => handlePerguntaGPT('squads-mais-entregas')}
-                          disabled={loadingGPT}
-                        >
-                          <span className="gpt-icon">👥</span>
-                          <span className="gpt-text">Squads mais produtivas</span>
-                        </button>
-                        
-                        <button 
-                          className={`gpt-button ${perguntaSelecionada === 'conteudo-slides' ? 'active' : ''}`}
-                          onClick={() => handlePerguntaGPT('conteudo-slides')}
-                          disabled={loadingGPT}
-                        >
-                          <span className="gpt-icon">🎬</span>
-                          <span className="gpt-text">Gerar conteúdo para slides</span>
+                          <span className="gpt-icon">📈</span>
+                          <span className="gpt-text">Análise de performance</span>
                         </button>
                       </div>
 
@@ -786,11 +784,15 @@ function Timeline() {
         <div className="modal-overlay" onClick={fecharModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <button className="modal-close" onClick={fecharModal}>×</button>
-            <div className="modal-header" style={{ borderTopColor: marcoSelecionado.cor }}>
+            <div className="modal-header" style={{ 
+              borderTopColor: marcoSelecionado.typeId === 1 ? '#2563eb' : marcoSelecionado.typeId === 2 ? '#059669' : '#dc2626' 
+            }}>
               <h2>{marcoSelecionado.titulo}</h2>
               <div className="modal-meta">
-                <span className="modal-type-badge" style={{ backgroundColor: marcoSelecionado.cor }}>
-                  {marcoSelecionado.typeId === 1 || marcoSelecionado.typeId === '1' ? '📦 Projeto' : '⚡ Melhoria'}
+                <span className="modal-type-badge" style={{ 
+                  backgroundColor: marcoSelecionado.typeId === 1 ? '#2563eb' : marcoSelecionado.typeId === 2 ? '#059669' : '#dc2626' 
+                }}>
+                  {marcoSelecionado.typeId === 1 ? '🖥️ Sistemas' : marcoSelecionado.typeId === 2 ? '⚙️ Infra' : '🔒 DevSecops'}
                 </span>
                 <div className="modal-date">{formatarData(marcoSelecionado.data)}</div>
               </div>
@@ -798,47 +800,29 @@ function Timeline() {
             <div className="modal-body">
               <div className="modal-section">
                 <h4 className="modal-section-title">Descrição</h4>
-                <p className="modal-description">{marcoSelecionado.descricao}</p>
+                <p className="modal-description" style={{ whiteSpace: 'pre-wrap' }}>{limparHTML(marcoSelecionado.descricao)}</p>
               </div>
               
               {marcoSelecionado.highlights && marcoSelecionado.highlights.trim() && (
                 <div className="modal-section">
                   <h4 className="modal-section-title">Destaques</h4>
                   <div className="modal-highlights">
-                    <div className="highlights-content">
-                      {marcoSelecionado.highlights.split('\n').filter(h => h.trim()).map((highlight, index) => (
-                        <div key={index} className="highlight-item">
-                          <span className="highlight-bullet">•</span>
-                          <span>{highlight.trim()}</span>
-                        </div>
-                      ))}
-                    </div>
+                    <p className="highlights-content" style={{ whiteSpace: 'pre-wrap' }}>{limparHTML(marcoSelecionado.highlights)}</p>
                   </div>
                 </div>
               )}
               
-              {marcoSelecionado.customerName && (
+              {marcoSelecionado.customer && (
                 <div className="modal-section">
                   <h4 className="modal-section-title">Área Fim</h4>
-                  <p className="modal-description">{marcoSelecionado.customerName}</p>
+                  <p className="modal-description">{marcoSelecionado.customer}</p>
                 </div>
               )}
               
-              {marcoSelecionado.customerFeedback && (
-                <div className="modal-section">
-                  <h4 className="modal-section-title">Feedback Final do Usuário</h4>
-                  <p className="modal-description">{marcoSelecionado.customerFeedback}</p>
-                </div>
-              )}
-              
-              {marcoSelecionado.squadIds && marcoSelecionado.squadIds.length > 0 && (
+              {(marcoSelecionado.squad || marcoSelecionado.squads) && (marcoSelecionado.squad || marcoSelecionado.squads).trim() && (
                 <div className="modal-section">
                   <h4 className="modal-section-title">Squads Participantes</h4>
-                  <div className="squads-list">
-                    {marcoSelecionado.squads && marcoSelecionado.squads.map((squad, index) => (
-                      <span key={index} className="squad-badge">{squad.name}</span>
-                    ))}
-                  </div>
+                  <p className="modal-description">{marcoSelecionado.squad || marcoSelecionado.squads}</p>
                 </div>
               )}
             </div>

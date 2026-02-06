@@ -12,7 +12,11 @@ export const goalService = {
   },
 
   create: async (goalData) => {
+    console.log('goalService.create - Enviando dados:', goalData)
     const response = await api.post('/Goal', goalData)
+    console.log('goalService.create - Resposta recebida:', response)
+    console.log('goalService.create - Status:', response.status)
+    console.log('goalService.create - Data:', response.data)
     return response.data
   },
 

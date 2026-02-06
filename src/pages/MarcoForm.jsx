@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useMarcosContext } from '../context/MarcosContext'
 import { useAuth } from '../context/AuthContext'
 import { showAlert } from '../App'
-import api from '../services/api'
 import './MarcoForm.css'
 
 function MarcoForm() {
@@ -15,23 +14,18 @@ function MarcoForm() {
   const [formData, setFormData] = useState({
     titulo: '',
     descricao: '',
-    squadIds: [],
+    squads: '', // Campo de texto para squads
     highlights: '',
     data: new Date().toISOString().split('T')[0],
-    typeId: 1, // Projeto por padrão
+    typeId: 1, // Sistemas por padrão
     statusId: 1, // Status pendente por padrão
-    sistema: '', // Sistema para melhorias
-    customerId: '', // Área fim
-    customerFeedback: '' // Feedback final do usuário
+    customer: '', // Área fim como texto
+    highlighted: false // Marco em destaque
   })
 
   const [errors, setErrors] = useState({})
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
-  const [squads, setSquads] = useState([])
-  const [loadingSquads, setLoadingSquads] = useState(false)
-  const [customers, setCustomers] = useState([])
-  const [loadingCustomers, setLoadingCustomers] = useState(false)
 
   useEffect(() => {
     if (id) {
@@ -39,43 +33,21 @@ function MarcoForm() {
       if (marco) {
         setFormData(prev => ({
           ...prev,
-          ...marco,
-          squadIds: Array.isArray(marco.squadIds) ? marco.squadIds : (marco.squadId ? [marco.squadId] : []),
-          customerFeedback: marco.customerFeedback || ''
+          titulo: marco.title || marco.titulo || '',
+          descricao: marco.description || marco.descricao || '',
+          highlights: marco.highlights || '',
+          data: marco.deliveryAt ? marco.deliveryAt.split('T')[0] : (marco.data || new Date().toISOString().split('T')[0]),
+          typeId: marco.typeId || 1,
+          statusId: marco.statusId || 1,
+          squads: marco.squad || marco.squads || '', // API retorna squad como string
+          customer: marco.customer || '',
+          highlighted: marco.highlighted || false
         }))
       }
     }
   }, [id, obterMarco])
 
-  useEffect(() => {
-    const carregarSquads = async () => {
-      setLoadingSquads(true)
-      try {
-        const response = await api.get('/squad')
-        setSquads(response.data)
-      } catch (error) {
-        console.error('Erro ao carregar squads:', error)
-      } finally {
-        setLoadingSquads(false)
-      }
-    }
-    carregarSquads()
-  }, [])
 
-  useEffect(() => {
-    const carregarCustomers = async () => {
-      setLoadingCustomers(true)
-      try {
-        const response = await api.get('/customer')
-        setCustomers(response.data)
-      } catch (error) {
-        console.error('Erro ao carregar customers:', error)
-      } finally {
-        setLoadingCustomers(false)
-      }
-    }
-    carregarCustomers()
-  }, [])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -92,22 +64,7 @@ function MarcoForm() {
     }
   }
 
-  const handleSquadToggle = (squadId) => {
-    setFormData(prev => {
-      const squadIds = prev.squadIds || []
-      const isSelected = squadIds.includes(squadId)
-      return {
-        ...prev,
-        squadIds: isSelected 
-          ? squadIds.filter(id => id !== squadId)
-          : [...squadIds, squadId]
-      }
-    })
-    // Limpa erro ao selecionar
-    if (errors.squadIds) {
-      setErrors(prev => ({ ...prev, squadIds: '' }))
-    }
-  }
+
 
   const validate = () => {
     const newErrors = {}
@@ -124,16 +81,12 @@ function MarcoForm() {
       newErrors.data = 'A data da entrega é obrigatória'
     }
     
-    if (!formData.squadIds || formData.squadIds.length === 0) {
-      newErrors.squadIds = 'Selecione pelo menos um squad'
+    if (!formData.squads || !formData.squads.trim()) {
+      newErrors.squads = 'Informe pelo menos um squad'
     }
     
-    if (!formData.customerId) {
-      newErrors.customerId = 'Selecione a área fim'
-    }
-    
-    if ((formData.typeId === 2 || formData.typeId === '2') && !formData.sistema) {
-      newErrors.sistema = 'Selecione o sistema para a melhoria'
+    if (!formData.customer || !formData.customer.trim()) {
+      newErrors.customer = 'Informe a área fim'
     }
 
     setErrors(newErrors)
@@ -151,15 +104,36 @@ function MarcoForm() {
     setSubmitError('')
 
     try {
+      // Mapeia os dados do formulário para o formato que a API espera
+      const dataToSend = {
+        title: formData.titulo,
+        description: formData.descricao,
+        highlights: formData.highlights,
+        deliveryAt: formData.data,
+        typeId: formData.typeId,
+        statusId: formData.statusId,
+        squad: formData.squads, // String com squads separados por vírgula
+        customer: formData.customer, // Área fim
+        highlighted: formData.highlighted === true // Boolean
+      }
+      
+      console.log('MarcoForm.handleSubmit - Dados a enviar:', dataToSend)
+      
       if (id) {
-        await editarMarco(id, formData)
+        console.log('MarcoForm.handleSubmit - Editando marco ID:', id)
+        await editarMarco(id, dataToSend)
+        console.log('MarcoForm.handleSubmit - Marco editado com sucesso!')
         showAlert('Marco atualizado com sucesso!', 'success')
       } else {
-        await adicionarMarco(formData)
+        console.log('MarcoForm.handleSubmit - Criando novo marco')
+        await adicionarMarco(dataToSend)
+        console.log('MarcoForm.handleSubmit - Marco criado com sucesso!')
         showAlert('Marco criado e enviado para aprovação!', 'success')
       }
       navigate('/')
     } catch (error) {
+      console.error('MarcoForm.handleSubmit - ERRO CAPTURADO:', error)
+      console.error('MarcoForm.handleSubmit - Stack trace:', error.stack)
       const errorMsg = id ? 'Erro ao atualizar marco. Tente novamente.' : 'Erro ao criar marco. Tente novamente.'
       setSubmitError(errorMsg)
       showAlert(errorMsg, 'error')
@@ -257,15 +231,32 @@ function MarcoForm() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="customerFeedback">Feedback Final do Usuário</label>
-          <textarea
-            id="customerFeedback"
-            name="customerFeedback"
-            value={formData.customerFeedback}
+          <label htmlFor="customer">Área Fim *</label>
+          <small className="form-hint">Informe a área de negócio beneficiada</small>
+          <input
+            type="text"
+            id="customer"
+            name="customer"
+            value={formData.customer}
             onChange={handleChange}
-            placeholder="Descreva o feedback recebido do usuário final (opcional)..."
-            rows="3"
+            placeholder="Ex: Diretoria de TI, Área de Compras..."
+            className={errors.customer ? 'error' : ''}
           />
+          {errors.customer && <span className="error-message">{errors.customer}</span>}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="squads">Squad(s) Participantes *</label>
+          <input
+            type="text"
+            id="squads"
+            name="squads"
+            value={formData.squads}
+            onChange={handleChange}
+            placeholder="Ex: Squad de Compras, Squad de Diárias, Squad de IA"
+            className={errors.squads ? 'error' : ''}
+          />
+          {errors.squads && <span className="error-message">{errors.squads}</span>}
         </div>
 
         <div className="form-group">
@@ -282,61 +273,6 @@ function MarcoForm() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="customerId">Área Fim *</label>
-          <small className="form-hint">Selecione a área de negócio beneficiada</small>
-          {loadingCustomers ? (
-            <div className="loading-customers">Carregando áreas...</div>
-          ) : (
-            <select
-              id="customerId"
-              name="customerId"
-              value={formData.customerId}
-              onChange={handleChange}
-              className={errors.customerId ? 'error' : ''}
-            >
-              <option value="">Selecione uma área</option>
-              {customers.map(customer => (
-                <option key={customer.id} value={customer.id}>
-                  {customer.name}
-                </option>
-              ))}
-            </select>
-          )}
-          {errors.customerId && <span className="error-message">{errors.customerId}</span>}
-        </div>
-
-        <div className="form-group">
-          <label>Selecione a(s) Squad(s) Participantes *</label>
-          <small className="form-hint">Você pode selecionar um ou mais squads</small>
-          {loadingSquads ? (
-            <div className="loading-squads">Carregando squads...</div>
-          ) : (
-            <div className={`squads-checkbox-group ${errors.squadIds ? 'error' : ''}`}>
-              {squads.length === 0 ? (
-                <div className="empty-squads">Nenhum squad disponível</div>
-              ) : (
-                squads.map(squad => (
-                  <label key={squad.id} className="squad-checkbox-item">
-                    <input
-                      type="checkbox"
-                      checked={(formData.squadIds || []).includes(squad.id)}
-                      onChange={() => handleSquadToggle(squad.id)}
-                    />
-                    <span className="squad-checkbox-label">{squad.name}</span>
-                  </label>
-                ))
-              )}
-            </div>
-          )}
-          {errors.squadIds && <span className="error-message">{errors.squadIds}</span>}
-          {formData.squadIds && formData.squadIds.length > 0 && (
-            <div className="selected-squads-count">
-              {formData.squadIds.length} squad{formData.squadIds.length > 1 ? 's' : ''} selecionado{formData.squadIds.length > 1 ? 's' : ''}
-            </div>
-          )}
-        </div>
-
-        <div className="form-group">
           <label>Tipo da Entrega *</label>
           <div className="type-selector">
             <label className="type-option">
@@ -348,10 +284,10 @@ function MarcoForm() {
                 onChange={(e) => setFormData(prev => ({ ...prev, typeId: parseInt(e.target.value) }))}
               />
               <span className="type-label">
-                <span className="type-icon" style={{ backgroundColor: '#2563eb' }}>📦</span>
+                <span className="type-icon" style={{ backgroundColor: '#2563eb' }}>🖥️</span>
                 <span className="type-text">
-                  <strong>Projeto</strong>
-                  <small>Novos projetos e iniciativas</small>
+                  <strong>Sistemas</strong>
+                  <small>Desenvolvimento de sistemas</small>
                 </span>
               </span>
             </label>
@@ -364,35 +300,48 @@ function MarcoForm() {
                 onChange={(e) => setFormData(prev => ({ ...prev, typeId: parseInt(e.target.value) }))}
               />
               <span className="type-label">
-                <span className="type-icon" style={{ backgroundColor: '#059669' }}>⚡</span>
+                <span className="type-icon" style={{ backgroundColor: '#2563eb' }}>⚙️</span>
                 <span className="type-text">
-                  <strong>Melhoria</strong>
-                  <small>Melhorias e otimizações</small>
+                  <strong>Infra</strong>
+                  <small>Infraestrutura e operações</small>
+                </span>
+              </span>
+            </label>
+            <label className="type-option">
+              <input
+                type="radio"
+                name="typeId"
+                value="3"
+                checked={formData.typeId === 3 || formData.typeId === '3'}
+                onChange={(e) => setFormData(prev => ({ ...prev, typeId: parseInt(e.target.value) }))}
+              />
+              <span className="type-label">
+                <span className="type-icon" style={{ backgroundColor: '#2563eb' }}>🔒</span>
+                <span className="type-text">
+                  <strong>DevSecops</strong>
+                  <small>Segurança e DevOps</small>
                 </span>
               </span>
             </label>
           </div>
         </div>
 
-        {(formData.typeId === 2 || formData.typeId === '2') && (
-          <div className="form-group">
-            <label htmlFor="sistema">Sistema *</label>
-            <small className="form-hint">Selecione o sistema que recebeu a melhoria</small>
-            <select
-              id="sistema"
-              name="sistema"
-              value={formData.sistema}
-              onChange={handleChange}
-              className={errors.sistema ? 'error' : ''}
-            >
-              <option value="">Selecione um sistema</option>
-              <option value="Sistema A">Sistema A</option>
-              <option value="Sistema B">Sistema B</option>
-              <option value="Sistema C">Sistema C</option>
-            </select>
-            {errors.sistema && <span className="error-message">{errors.sistema}</span>}
-          </div>
-        )}
+        <div className="form-group">
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              id="highlighted"
+              name="highlighted"
+              checked={formData.highlighted}
+              onChange={(e) => setFormData(prev => ({ ...prev, highlighted: e.target.checked }))}
+              className="checkbox-input"
+            />
+            <span className="checkbox-text">
+              ⭐ Marcar como Destaque
+              <small className="checkbox-hint">Este marco será destacado na timeline</small>
+            </span>
+          </label>
+        </div>
 
         <div className="form-actions">
           <button type="button" onClick={handleCancel} className="btn-cancel" disabled={submitting}>
