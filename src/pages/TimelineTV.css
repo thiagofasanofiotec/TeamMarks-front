@@ -1,0 +1,265 @@
+.timeline-tv {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.tv-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  color: white;
+  position: relative;
+}
+
+.tv-fullscreen-btn {
+  position: absolute;
+  top: 0;
+  right: 2rem;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  color: white;
+  font-size: 2rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  display: grid;
+  place-items: center;
+}
+
+.tv-fullscreen-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: scale(1.1);
+}
+
+.tv-fullscreen-btn:active {
+  transform: scale(0.95);
+}
+
+.tv-header h1 {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.tv-controls {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.tv-stats {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.tv-total {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.5rem 1.5rem;
+  border-radius: 25px;
+  backdrop-filter: blur(10px);
+}
+
+.tv-pagination {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.5rem 1.5rem;
+  border-radius: 25px;
+  backdrop-filter: blur(10px);
+}
+
+.tv-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 3rem;
+}
+
+.tv-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  width: 100%;
+  max-width: 1800px;
+  padding: 0 2rem;
+}
+
+.tv-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  position: relative;
+  animation: slideIn 0.6s ease-out;
+  transition: transform 0.3s ease;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tv-card-highlighted {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 3px solid #fbbf24;
+}
+
+.tv-star {
+  position: absolute;
+  top: -15px;
+  right: 20px;
+  font-size: 40px;
+  animation: pulse-star 2s ease-in-out infinite;
+  background: white;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
+}
+
+.tv-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.tv-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.tv-date {
+  color: #64748b;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.tv-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+  min-height: 60px;
+}
+
+.tv-description {
+  color: #475569;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  flex: 1;
+}
+
+.tv-squads,
+.tv-customer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: #f1f5f9;
+  border-radius: 10px;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.tv-squads-label,
+.tv-customer-label {
+  font-weight: 600;
+  color: #475569;
+}
+
+.tv-squads-value,
+.tv-customer-value {
+  color: #1e293b;
+}
+
+.tv-indicators {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.tv-indicator {
+  width: 60px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.tv-indicator.active {
+  background: white;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.5);
+}
+
+.tv-empty-state {
+  text-align: center;
+  color: white;
+  padding: 4rem 2rem;
+}
+
+.tv-empty-icon {
+  font-size: 6rem;
+  margin-bottom: 2rem;
+  opacity: 0.5;
+}
+
+.tv-empty-state h2 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.tv-empty-state p {
+  font-size: 1.5rem;
+  opacity: 0.8;
+}
+
+/* Responsivo */
+@media (max-width: 1400px) {
+  .tv-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .tv-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .tv-header h1 {
+    font-size: 2rem;
+  }
+
+  .tv-title {
+    font-size: 1.5rem;
+  }
+}

@@ -1,7 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './Confirm.css'
-
-let resolveCallback
 
 function Confirm({ refShow }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -12,22 +10,29 @@ function Confirm({ refShow }) {
     cancelText: 'Cancelar',
     type: 'warning' // 'warning', 'danger', 'info'
   })
+  const resolveRef = useRef(null)
 
   const handleCancel = () => {
     setIsOpen(false)
-    resolveCallback(false)
+    if (resolveRef.current) {
+      resolveRef.current(false)
+      resolveRef.current = null
+    }
   }
 
   const handleConfirm = () => {
     setIsOpen(false)
-    resolveCallback(true)
+    if (resolveRef.current) {
+      resolveRef.current(true)
+      resolveRef.current = null
+    }
   }
 
   const show = (props = {}) => {
-    setConfig({ ...config, ...props })
+    setConfig(prevConfig => ({ ...prevConfig, ...props }))
     setIsOpen(true)
     return new Promise((resolve) => {
-      resolveCallback = resolve
+      resolveRef.current = resolve
     })
   }
 
@@ -38,8 +43,10 @@ function Confirm({ refShow }) {
   }
 
   useEffect(() => {
-    refShow(show)
-  }, [])
+    if (refShow) {
+      refShow(show)
+    }
+  }, [refShow])
 
   if (!isOpen) return null
 

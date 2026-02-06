@@ -28,5 +28,10 @@ export const goalService = {
   delete: async (id) => {
     const response = await api.delete(`/Goal/${id}`)
     return response.data
+  },
+
+  getSquads: async () => {
+    const response = await api.get('/AzureDevOps/squads')
+    return response.data
   }
 }

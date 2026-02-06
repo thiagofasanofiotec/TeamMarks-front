@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react'
 import './Alert.css'
 
-let showAlertCallback
-
 function Alert({ refShow }) {
   const [alerts, setAlerts] = useState([])
 
@@ -22,8 +20,10 @@ function Alert({ refShow }) {
   }
 
   useEffect(() => {
-    refShow(show)
-  }, [])
+    if (refShow) {
+      refShow(show)
+    }
+  }, [refShow])
 
   const getIcon = (type) => {
     switch (type) {

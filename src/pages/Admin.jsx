@@ -84,6 +84,24 @@ function Admin() {
   }
 
   const handleRejeitar = async (marco) => {
+    if (!showConfirm) {
+      console.error('showConfirm não está disponível')
+      alert('Erro ao carregar componente de confirmação. Recarregue a página.')
+      return
+    }
+
+    const confirmed = await showConfirm({
+      title: 'Confirmar Rejeição',
+      message: `Tem certeza que deseja rejeitar o marco "${marco.titulo}"?`,
+      confirmText: 'Sim, rejeitar',
+      cancelText: 'Cancelar',
+      type: 'danger'
+    })
+
+    if (!confirmed) {
+      return
+    }
+
     setProcessando(marco.id)
     try {
       await api.put(`/Goal/${marco.id}/reject`)

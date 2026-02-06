@@ -14,6 +14,7 @@ function Timeline() {
   const [modalAberto, setModalAberto] = useState(false)
   const [marcoSelecionado, setMarcoSelecionado] = useState(null)
   const [filtroTipo, setFiltroTipo] = useState(null) // null = todos, 1 = sistemas, 2 = infra, 3 = devsecops
+  const [anoSelecionado, setAnoSelecionado] = useState(null) // Será definido automaticamente para o ano mais recente
   const [visualizacao, setVisualizacao] = useState('timeline') // 'timeline', 'resumo' ou 'insights'
   const [perguntaSelecionada, setPerguntaSelecionada] = useState(null)
   const [loadingGPT, setLoadingGPT] = useState(false)
@@ -27,10 +28,29 @@ function Timeline() {
   // Filtra apenas entregas aprovadas (status 2)
   const marcosAprovados = marcos.filter(m => m.statusId === 2)
   
+  // Extrai anos únicos disponíveis
+  const anosDisponiveis = [...new Set(
+    marcosAprovados
+      .filter(m => m.data)
+      .map(m => m.data.split('-')[0])
+  )].sort((a, b) => b - a) // Ordem decrescente (mais recente primeiro)
+  
+  // Define o ano mais recente como padrão quando carrega os dados
+  useEffect(() => {
+    if (anosDisponiveis.length > 0 && !anoSelecionado) {
+      setAnoSelecionado(anosDisponiveis[0])
+    }
+  }, [anosDisponiveis.length])
+  
+  // Aplica filtro de ano primeiro
+  const marcosFiltradosPorAno = anoSelecionado
+    ? marcosAprovados.filter(m => m.data && m.data.startsWith(anoSelecionado))
+    : marcosAprovados
+  
   // Aplica filtro de tipo se selecionado
   const marcosFiltrados = filtroTipo 
-    ? marcosAprovados.filter(m => m.typeId === filtroTipo)
-    : marcosAprovados
+    ? marcosFiltradosPorAno.filter(m => m.typeId === filtroTipo)
+    : marcosFiltradosPorAno
   
   // Ordena as entregas por data
   const marcosSorted = [...marcosFiltrados].sort((a, b) => new Date(a.data) - new Date(b.data))
@@ -466,18 +486,34 @@ function Timeline() {
       
       {visualizacao === 'timeline' && (
         <div className="timeline-filters">
-          <div className="filter-select-container">
-            <select 
-              id="filtro-tipo"
-              value={filtroTipo === null ? 'todos' : filtroTipo}
-              onChange={(e) => toggleFiltro(e.target.value === 'todos' ? null : parseInt(e.target.value))}
-              className="tipo-filter-select"
-            >
-              <option value="todos">📋 Todos ({marcosAprovados.length})</option>
-              <option value="1">🖥️ Sistemas ({marcosAprovados.filter(m => m.typeId === 1).length})</option>
-              <option value="2">⚙️ Infra ({marcosAprovados.filter(m => m.typeId === 2).length})</option>
-              <option value="3">🔒 DevSecops ({marcosAprovados.filter(m => m.typeId === 3).length})</option>
-            </select>
+          <div className="filters-left-group">
+            <div className="filter-select-container">
+              <select 
+                id="filtro-ano"
+                value={anoSelecionado || ''}
+                onChange={(e) => setAnoSelecionado(e.target.value)}
+                className="tipo-filter-select"
+              >
+                {anosDisponiveis.map(ano => (
+                  <option key={ano} value={ano}>
+                    📅 {ano} ({marcosAprovados.filter(m => m.data && m.data.startsWith(ano)).length})
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="filter-select-container">
+              <select 
+                id="filtro-tipo"
+                value={filtroTipo === null ? 'todos' : filtroTipo}
+                onChange={(e) => toggleFiltro(e.target.value === 'todos' ? null : parseInt(e.target.value))}
+                className="tipo-filter-select"
+              >
+                <option value="todos">📋 Todas as áreas ({marcosFiltradosPorAno.length})</option>
+                <option value="1">🖥️ Sistemas ({marcosFiltradosPorAno.filter(m => m.typeId === 1).length})</option>
+                <option value="2">⚙️ Infra ({marcosFiltradosPorAno.filter(m => m.typeId === 2).length})</option>
+                <option value="3">🔒 DevSecops ({marcosFiltradosPorAno.filter(m => m.typeId === 3).length})</option>
+              </select>
+            </div>
           </div>
           <button 
             className="btn-adicionar-entrega"

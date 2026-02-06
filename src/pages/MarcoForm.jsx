@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useMarcosContext } from '../context/MarcosContext'
 import { useAuth } from '../context/AuthContext'
 import { showAlert } from '../App'
+import { goalService } from '../services/goalService'
 import './MarcoForm.css'
 
 function MarcoForm() {
@@ -20,12 +21,34 @@ function MarcoForm() {
     typeId: 1, // Sistemas por padrão
     statusId: 1, // Status pendente por padrão
     customer: '', // Área fim como texto
+    applicant: '', // Aplicação
     highlighted: false // Marco em destaque
   })
 
   const [errors, setErrors] = useState({})
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
+  const [squadsDisponiveis, setSquadsDisponiveis] = useState([])
+
+  // Busca squads da API do Azure DevOps
+  useEffect(() => {
+    const carregarSquads = async () => {
+      try {
+        const response = await goalService.getSquads()
+        console.log('Squads retornados da API:', response)
+        // A API retorna { count: X, data: [...] }
+        if (response && Array.isArray(response.data)) {
+          setSquadsDisponiveis(response.data)
+        } else {
+          setSquadsDisponiveis([])
+        }
+      } catch (error) {
+        console.error('Erro ao carregar squads:', error)
+        setSquadsDisponiveis([])
+      }
+    }
+    carregarSquads()
+  }, [])
 
   useEffect(() => {
     if (id) {
@@ -41,6 +64,7 @@ function MarcoForm() {
           statusId: marco.statusId || 1,
           squads: marco.squad || marco.squads || '', // API retorna squad como string
           customer: marco.customer || '',
+          applicant: marco.applicant || '',
           highlighted: marco.highlighted || false
         }))
       }
@@ -114,6 +138,7 @@ function MarcoForm() {
         statusId: formData.statusId,
         squad: formData.squads, // String com squads separados por vírgula
         customer: formData.customer, // Área fim
+        applicant: formData.applicant, // Aplicação
         highlighted: formData.highlighted === true // Boolean
       }
       
@@ -246,16 +271,31 @@ function MarcoForm() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="squads">Squad(s) Participantes *</label>
+          <label htmlFor="applicant">Aplicação</label>
           <input
             type="text"
+            id="applicant"
+            name="applicant"
+            value={formData.applicant}
+            onChange={handleChange}
+            placeholder="Ex: Sistema de Compras, Portal RH..."
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="squads">Squad(s) Participantes *</label>
+          <select
             id="squads"
             name="squads"
             value={formData.squads}
             onChange={handleChange}
-            placeholder="Ex: Squad de Compras, Squad de Diárias, Squad de IA"
             className={errors.squads ? 'error' : ''}
-          />
+          >
+            <option value="">Selecione um squad</option>
+            {squadsDisponiveis.map((squad, index) => (
+              <option key={index} value={squad}>{squad}</option>
+            ))}
+          </select>
           {errors.squads && <span className="error-message">{errors.squads}</span>}
         </div>
 

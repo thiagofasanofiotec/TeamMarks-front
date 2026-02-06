@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
 import Timeline from './pages/Timeline'
+import TimelineTV from './pages/TimelineTV'
 import MarcoForm from './pages/MarcoForm'
 import Login from './pages/Login'
 import Admin from './pages/Admin'
@@ -33,7 +33,8 @@ function AppLayout() {
         <div className="header-content">
           <h1>Observatório TI</h1>
           <nav>
-            <Link to="/">Timeline</Link>
+            <Link to="/">Timeline Web</Link>
+            <Link to="/timeline-tv">Timeline TV</Link>
             {user && (
               <>
                 {isContribuidor && (
@@ -57,6 +58,7 @@ function AppLayout() {
       <main className="app-main">
         <Routes>
           <Route path="/" element={<Timeline />} />
+          <Route path="/timeline-tv" element={<TimelineTV />} />
           <Route path="/novo-marco" element={<PrivateRoute><MarcoForm /></PrivateRoute>} />
           <Route path="/editar-marco/:id" element={<PrivateRoute><MarcoForm /></PrivateRoute>} />
           <Route path="/admin" element={<PrivateRoute><Admin /></PrivateRoute>} />
@@ -67,14 +69,16 @@ function AppLayout() {
 }
 
 function App() {
-  const [confirmRef, setConfirmRef] = useState(null)
-
   const refShowConfirm = (show) => {
-    showConfirm = show
+    if (show) {
+      showConfirm = show
+    }
   }
 
   const refShowAlert = (show) => {
-    showAlert = show
+    if (show) {
+      showAlert = show
+    }
   }
 
   return (

@@ -38,6 +38,7 @@ export const MarcosProvider = ({ children }) => {
         squad: goal.squad || '', // String
         squads: goal.squad || '', // String
         customer: goal.customer || '',
+        applicant: goal.applicant || '', // Aplicação
         highlighted: goal.highlighted || false
       }))
       setMarcos(marcosFormatados)
