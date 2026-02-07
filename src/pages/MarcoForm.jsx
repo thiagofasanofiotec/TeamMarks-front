@@ -169,7 +169,7 @@ function MarcoForm() {
   }
 
   const handleCancel = () => {
-    navigate('/')
+    navigate('/admin')
   }
 
   return (
