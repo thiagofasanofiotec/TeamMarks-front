@@ -12,6 +12,39 @@
   padding: 0 0 1rem 0;
   border-bottom: 2px solid #e8edf2;
   margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.timeline-view-toggle {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.timeline-info-banner {
+  background: #f0f9ff;
+  border-left: 3px solid #93c5fd;
+  padding: 0.5rem 0.75rem;
+  margin: 0;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #475569;
+  font-size: 0.8rem;
+  font-weight: 400;
+  box-shadow: none;
+  white-space: nowrap;
+}
+
+.info-icon {
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  opacity: 0.7;
 }
 
 .timeline-container h2 {
@@ -300,6 +333,28 @@
   transform: translateX(50%);
 }
 
+.timeline-date-badge {
+  position: absolute;
+  background: #2563eb;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  top: 32px;
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+.timeline-item-right .timeline-date-badge {
+  right: calc(100% + 3rem);
+}
+
+.timeline-item-left .timeline-date-badge {
+  left: calc(100% + 3rem);
+}
+
 .timeline-card-vertical {
   background: #ffffff;
   border-radius: 16px;
@@ -386,13 +441,7 @@
   min-width: 0;
 }
 
-.timeline-date-vertical {
-  font-size: 0.85rem;
-  color: #94a3b8;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
+/* .timeline-date-vertical - não usado mais, data agora é timeline-date-badge */
 
 .timeline-title-vertical {
   color: #1e293b;
@@ -424,14 +473,14 @@
 }
 
 .timeline-mes-label {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: #000000;
   color: white;
   padding: 0.75rem 2rem;
   border-radius: 30px;
   font-size: 1rem;
   font-weight: 700;
   text-transform: capitalize;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   letter-spacing: 0.5px;
 }
 
@@ -869,6 +918,13 @@
   margin: 0 auto;
 }
 
+.resumo-ia-container > h4 {
+  color: #1e293b;
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+}
+
 .resumo-header {
   text-align: center;
   margin-bottom: 2.5rem;
@@ -1259,17 +1315,25 @@
 }
 
 .resumo-footer {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  padding: 1.5rem;
-  border-radius: 12px;
-  border: 2px solid #fbbf24;
-  text-align: center;
+  background: #f0f9ff;
+  border-left: 3px solid #93c5fd;
+  padding: 0.5rem 0.75rem;
+  margin: 0;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #475569;
+  font-size: 0.8rem;
+  font-weight: 400;
+  box-shadow: none;
+  white-space: nowrap;
 }
 
 .resumo-footer p {
-  color: #78350f;
+  color: #475569;
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 0.8rem;
   line-height: 1.6;
 }
 
@@ -1279,11 +1343,9 @@
 }
 /* GPT Perguntas Section */
 .gpt-perguntas-section {
-  margin-top: 2rem;
   padding: 2rem;
   background: white;
   border-radius: 12px;
-  border: 2px solid #e2e8f0;
 }
 
 .gpt-perguntas-section h4 {
@@ -1549,4 +1611,76 @@
   font-weight: 600;
   border: 1px solid #93c5fd;
   box-shadow: 0 1px 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Navegação por meses */
+.month-navigation {
+  position: sticky;
+  top: 0;
+  z-index: 150;
+  width: calc(100% + 4rem);
+  margin-left: -2rem;
+  margin-right: -2rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border: 1px solid #cbd5e1;
+  border-left: none;
+  border-right: none;
+  border-radius: 0;
+  padding: 1rem 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.month-navigation-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+.month-navigation-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.month-nav-btn {
+  background: white;
+  border: 2px solid #2563eb;
+  color: #2563eb;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.month-nav-btn:hover {
+  background: #2563eb;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.month-nav-btn:active {
+  transform: translateY(0);
 }

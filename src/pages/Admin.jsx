@@ -12,6 +12,9 @@ function Admin() {
   const navigate = useNavigate()
   const [filtroStatus, setFiltroStatus] = useState('1') // 1: Pendentes por padrão
   const [processando, setProcessando] = useState(null)
+  const [buscaTitulo, setBuscaTitulo] = useState('')
+  const [filtroAno, setFiltroAno] = useState('')
+  const [filtroMes, setFiltroMes] = useState('')
 
   useEffect(() => {
     carregarMarcos()
@@ -164,9 +167,44 @@ function Admin() {
     })
   }
 
+  // Extrai anos únicos
+  const anosDisponiveis = [...new Set(
+    marcos
+      .filter(m => m.data)
+      .map(m => m.data.split('-')[0])
+  )].sort((a, b) => b - a)
+
   const marcosFiltrados = marcos.filter(m => {
-    if (filtroStatus === 'todos') return true
-    return m.statusId === parseInt(filtroStatus)
+    // Filtro por status
+    if (filtroStatus !== 'todos' && m.statusId !== parseInt(filtroStatus)) {
+      return false
+    }
+    
+    // Filtro por título
+    if (buscaTitulo) {
+      if (!m.titulo) return false
+      const tituloNormalizado = m.titulo.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      const buscaNormalizada = buscaTitulo.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      console.log('Buscando:', buscaNormalizada, 'em:', tituloNormalizado, 'Match:', tituloNormalizado.includes(buscaNormalizada))
+      if (!tituloNormalizado.includes(buscaNormalizada)) {
+        return false
+      }
+    }
+    
+    // Filtro por ano
+    if (filtroAno && m.data && !m.data.startsWith(filtroAno)) {
+      return false
+    }
+    
+    // Filtro por mês
+    if (filtroMes && m.data) {
+      const mesMarco = m.data.split('-')[1]
+      if (mesMarco !== filtroMes) {
+        return false
+      }
+    }
+    
+    return true
   })
 
   const contadores = {
@@ -175,23 +213,11 @@ function Admin() {
     rejeitados: marcos.filter(m => m.statusId === 3).length
   }
 
-  if (user?.roleId !== 'Aprovador') {
-    return (
-      <div className="admin-container">
-        <div className="access-denied">
-          <h2>Acesso Negado</h2>
-          <p>Você não tem permissão para acessar esta área.</p>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="admin-container">
-      <div className="admin-header">
+      <div className="admin-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h2>Administração de Entregas</h2>
-          <p className="admin-subtitle">Gerencie as solicitações de entregas da equipe</p>
         </div>
       </div>
 
@@ -216,6 +242,62 @@ function Admin() {
         >
           <span className="stat-number">{contadores.rejeitados}</span>
           <span className="stat-label">Rejeitados</span>
+        </div>
+      </div>
+
+      <div className="admin-filters">
+        <div className="filter-search">
+          <input
+            type="text"
+            placeholder="🔍 Buscar por título..."
+            value={buscaTitulo}
+            onChange={(e) => setBuscaTitulo(e.target.value)}
+            className="search-input"
+          />
+        </div>
+        <div className="filter-selects">
+          <select 
+            value={filtroAno} 
+            onChange={(e) => setFiltroAno(e.target.value)}
+            className="filter-select"
+          >
+            <option value="">📅 Todos os anos</option>
+            {anosDisponiveis.map(ano => (
+              <option key={ano} value={ano}>{ano}</option>
+            ))}
+          </select>
+          <select 
+            value={filtroMes} 
+            onChange={(e) => setFiltroMes(e.target.value)}
+            className="filter-select"
+          >
+            <option value="">📆 Todos os meses</option>
+            <option value="01">Janeiro</option>
+            <option value="02">Fevereiro</option>
+            <option value="03">Março</option>
+            <option value="04">Abril</option>
+            <option value="05">Maio</option>
+            <option value="06">Junho</option>
+            <option value="07">Julho</option>
+            <option value="08">Agosto</option>
+            <option value="09">Setembro</option>
+            <option value="10">Outubro</option>
+            <option value="11">Novembro</option>
+            <option value="12">Dezembro</option>
+          </select>
+          {(buscaTitulo || filtroAno || filtroMes) && (
+            <button 
+              className="clear-filters-btn"
+              onClick={() => {
+                setBuscaTitulo('')
+                setFiltroAno('')
+                setFiltroMes('')
+              }}
+              title="Limpar filtros"
+            >
+              ✕ Limpar
+            </button>
+          )}
         </div>
       </div>
 

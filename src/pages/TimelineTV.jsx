@@ -107,12 +107,11 @@ function TimelineTV() {
           <div className="tv-stats-container">
             <div className="tv-stat-card">
               <div className="tv-stat-icon">🎯</div>
-              <div className="tv-stat-content">
-                <div className="tv-stat-value">{marcosAprovados.length}</div>
-                <div className="tv-stat-label">Total de Entregas</div>
-              </div>
+              <div className="tv-stat-value">{marcosAprovados.length}</div>
+              <div className="tv-stat-label">Total de Entregas</div>
             </div>
           </div>
+          <div className="tv-info-text">Dados a partir de Maio de 2025</div>
         </div>
         
         <button 
@@ -156,7 +155,7 @@ function TimelineTV() {
 
               <h2 className="tv-title">{marco.titulo}</h2>
               
-              <p className="tv-description">{truncarTexto(marco.descricao, 200)}</p>
+              <p className="tv-description">{truncarTexto(marco.highlights || marco.descricao, 200)}</p>
 
               {marco.squads && (
                 <div className="tv-squads">

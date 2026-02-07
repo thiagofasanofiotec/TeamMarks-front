@@ -4,6 +4,7 @@
   padding: 2rem;
   display: flex;
   flex-direction: column;
+  border-radius: 10px;
 }
 
 .tv-header {
@@ -47,6 +48,14 @@
   text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
+.tv-info-text {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  font-weight: 400;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
 .tv-controls {
   display: flex;
   gap: 2rem;
@@ -72,7 +81,8 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
-  gap: 1rem;
+  justify-content: center;
+  gap: 0.75rem;
   transition: all 0.3s ease;
   min-width: 180px;
 }
@@ -88,12 +98,6 @@
   opacity: 0.9;
 }
 
-.tv-stat-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-}
-
 .tv-stat-value {
   font-size: 1.8rem;
   font-weight: 700;
@@ -102,11 +106,12 @@
 }
 
 .tv-stat-label {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.85);
   text-transform: uppercase;
   letter-spacing: 0.3px;
+  white-space: nowrap;
 }
 
 .tv-content {

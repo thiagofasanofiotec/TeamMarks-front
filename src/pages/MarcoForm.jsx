@@ -21,7 +21,8 @@ function MarcoForm() {
     typeId: 1, // Sistemas por padrão
     statusId: 1, // Status pendente por padrão
     applicant: '', // Aplicação
-    highlighted: false // Marco em destaque
+    highlighted: false, // Marco em destaque
+    descriptionGeneratedIA: false // Novo campo para checkbox IA
   })
 
   const [errors, setErrors] = useState({})
@@ -63,19 +64,25 @@ function MarcoForm() {
           statusId: marco.statusId || 1,
           squads: marco.squad || marco.squads || '', // API retorna squad como string
           applicant: marco.applicant || '',
-          highlighted: marco.highlighted || false
+          highlighted: marco.highlighted || false,
+          descriptionGeneratedIA: marco.descriptionGeneratedIA || false
         }))
       }
     }
   }, [id, obterMarco])
 
 
+    useEffect(() => {
+    console.log('FormData atualizado:', formData)
+    }, [formData]);
+
+
 
   const handleChange = (e) => {
-    const { name, value } = e.target
+    const { name, value, type, checked } = e.target
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     }))
     // Limpa o erro do campo quando o usuário começa a digitar
     if (errors[name]) {
@@ -132,7 +139,8 @@ function MarcoForm() {
         statusId: formData.statusId,
         squad: formData.squads, // String com squads separados por vírgula
         applicant: formData.applicant, // Aplicação
-        highlighted: formData.highlighted === true // Boolean
+        highlighted: formData.highlighted === true, // Boolean
+        descriptionGeneratedIA: formData.descriptionGeneratedIA === true // Boolean
       }
       
       console.log('MarcoForm.handleSubmit - Dados a enviar:', dataToSend)
@@ -162,37 +170,6 @@ function MarcoForm() {
 
   const handleCancel = () => {
     navigate('/')
-  }
-
-  // Verifica se o usuário tem permissão
-  // Contribuidor: só pode criar novos marcos
-  // Aprovador: pode editar marcos aprovados
-  if (user?.roleId === 'Contribuidor' && id) {
-    return (
-      <div className="form-container">
-        <div className="access-denied">
-          <h2>Acesso Negado</h2>
-          <p>Contribuidores não podem editar entregas aprovadas.</p>
-          <button onClick={() => navigate('/')} className="btn-primary">
-            Voltar para Timeline
-          </button>
-        </div>
-      </div>
-    )
-  }
-
-  if (!user?.roleId || (user.roleId !== 'Contribuidor' && user.roleId !== 'Aprovador')) {
-    return (
-      <div className="form-container">
-        <div className="access-denied">
-          <h2>Acesso Negado</h2>
-          <p>Você não tem permissão para acessar esta página.</p>
-          <button onClick={() => navigate('/')} className="btn-primary">
-            Voltar para Timeline
-          </button>
-        </div>
-      </div>
-    )
   }
 
   return (
@@ -246,6 +223,26 @@ function MarcoForm() {
             placeholder="Principais conquistas e destaques (opcional)..."
             rows="3"
           />
+          <span style={{
+            background: '#f3f4f6',
+            color: '#000',
+            fontSize: '0.82em',
+            padding: '4px 10px',
+            borderRadius: '6px',
+            marginTop: '8px',
+            display: 'inline-block',
+            fontWeight: 500
+          }}>
+            <input
+              type="checkbox"
+              id="descriptionGeneratedIA"
+              name="descriptionGeneratedIA"
+              checked={formData.descriptionGeneratedIA}
+              onChange={handleChange}
+              style={{ marginRight: '6px', verticalAlign: 'middle' }}
+            />
+            🤖 Os destaques foram gerados por inteligência artificial a partir da descrição.
+          </span>
         </div>
 
         <div className="form-group">

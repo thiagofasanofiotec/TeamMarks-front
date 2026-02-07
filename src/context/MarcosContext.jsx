@@ -39,7 +39,8 @@ export const MarcosProvider = ({ children }) => {
         squads: goal.squad || '', // String
         customer: goal.customer || '',
         applicant: goal.applicant || '', // Aplicação
-        highlighted: goal.highlighted || false
+        highlighted: goal.highlighted || false,
+        descriptionGeneratedIA: goal.descriptionGeneratedIA || false
       }))
       setMarcos(marcosFormatados)
     } catch (err) {
