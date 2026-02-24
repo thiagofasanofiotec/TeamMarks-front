@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom'
+﻿import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import Timeline from './pages/Timeline'
 import TimelineTV from './pages/TimelineTV'
@@ -14,13 +14,14 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import PrivateRoute from './components/PrivateRoute'
 import './App.css'
 
-// Variável global para acessar o confirm e alert
+// VariÃ¡vel global para acessar o confirm e alert
 export let showConfirm
 export let showAlert
 
 function AppLayout() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isTimelineView, setIsTimelineView] = useState(true)
 
@@ -49,10 +50,11 @@ function AppLayout() {
 
   const isAprovador = user?.roleId === 'Aprovador'
   const isContribuidor = user?.roleId === 'Contribuidor'
+  const isRootRoute = location.pathname === '/'
 
   return (
     <div className="app">
-      <header className={`app-header ${isScrolled && isTimelineView ? 'scrolled' : ''}`}>
+      <header className={`app-header ${isScrolled && isTimelineView && isRootRoute ? 'scrolled' : ''}`}>
         <div className="header-content">
           <h1>Observatório TI</h1>
           <nav>
@@ -141,3 +143,5 @@ function App() {
 }
 
 export default App
+
+

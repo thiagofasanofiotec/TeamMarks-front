@@ -329,13 +329,13 @@ function Admin() {
                 <span className="card-date">{formatarData(marco.data)}</span>
               </div>
               
-              <p className="card-description" style={{ whiteSpace: 'pre-wrap' }}>{limparHTML(marco.descricao)}</p>
+              {/* <p className="card-description" style={{ whiteSpace: 'pre-wrap' }}>{limparHTML(marco.descricao)}</p> */}
               
-              {marco.highlights && (
+              {/* {marco.highlights && (
                 <div className="card-highlights">
                   <strong>Destaques:</strong> <span style={{ whiteSpace: 'pre-wrap' }}>{limparHTML(marco.highlights)}</span>
                 </div>
-              )}
+              )} */}
               
               <div className="card-footer">
                 <div className="card-info">
