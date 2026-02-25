@@ -1,21 +1,20 @@
-import { useState, useEffect, useRef } from 'react'
+﻿import { useState, useEffect, useRef } from 'react'
 import { useMarcosContext } from '../context/MarcosContext'
 import './TimelineTV.css'
 
 function TimelineTV() {
   const { marcos } = useMarcosContext()
+  const ITEMS_PER_SLIDE = 3
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const intervalRef = useRef(null)
   const containerRef = useRef(null)
 
-  // Filtra apenas marcos aprovados
   const marcosAprovados = marcos
-    .filter(m => m.statusId === 2)
-    .sort((a, b) => new Date(b.data) - new Date(a.data)) // Mais recente primeiro
-  
-  // Calcula quantos slides temos (3 entregas por slide)
-  const totalSlides = Math.ceil(marcosAprovados.length / 3)
+    .filter((m) => m.statusId === 2)
+    .sort((a, b) => new Date(b.data) - new Date(a.data))
+
+  const totalSlides = Math.ceil(marcosAprovados.length / ITEMS_PER_SLIDE)
 
   const formatarData = (dataString) => {
     if (!dataString) return ''
@@ -46,8 +45,8 @@ function TimelineTV() {
   useEffect(() => {
     if (totalSlides > 1) {
       intervalRef.current = setInterval(() => {
-        setCurrentSlide(prev => (prev + 1) % totalSlides)
-      }, 10000) // 10 segundos
+        setCurrentSlide((prev) => (prev + 1) % totalSlides)
+      }, 15000)
 
       return () => {
         if (intervalRef.current) {
@@ -57,20 +56,25 @@ function TimelineTV() {
     }
   }, [totalSlides])
 
-  // Pega as 3 entregas do slide atual
-  const startIndex = currentSlide * 3
-  const currentMarcos = marcosAprovados.slice(startIndex, startIndex + 3)
+  const startIndex = currentSlide * ITEMS_PER_SLIDE
+  const currentMarcos = marcosAprovados.slice(startIndex, startIndex + ITEMS_PER_SLIDE)
 
   const getTypeIcon = (typeId) => {
-    return typeId === 1 ? '🖥️' : typeId === 2 ? '⚙️' : '🔒'
+    if (typeId === 1) return '\uD83D\uDDA5\uFE0F'
+    if (typeId === 2) return '\uD83D\uDEE0\uFE0F'
+    return '\uD83D\uDD12'
   }
 
   const getTypeLabel = (typeId) => {
-    return typeId === 1 ? 'Sistemas' : typeId === 2 ? 'Infra' : 'DevSecops'
+    if (typeId === 1) return 'Sistemas'
+    if (typeId === 2) return 'Infra'
+    return 'DevSecops'
   }
 
   const getTypeColor = (typeId) => {
-    return typeId === 1 ? '#2563eb' : typeId === 2 ? '#059669' : '#dc2626'
+    if (typeId === 1) return '#2563eb'
+    if (typeId === 2) return '#059669'
+    return '#dc2626'
   }
 
   const toggleFullscreen = async () => {
@@ -101,71 +105,64 @@ function TimelineTV() {
   return (
     <div className="timeline-tv" ref={containerRef}>
       <div className="tv-header">
-        <h1>📊 Timeline de Entregas TI</h1>
-        
-        <div className="tv-controls">
-          <div className="tv-stats-container">
-            <div className="tv-stat-card">
-              <div className="tv-stat-icon">🎯</div>
-              <div className="tv-stat-value">{marcosAprovados.length}</div>
-              <div className="tv-stat-label">Total de Entregas</div>
-            </div>
-          </div>
-          <div className="tv-info-text">Dados a partir de Maio de 2025</div>
+        <div className="tv-header-top">
+          <h1>Timeline de Entregas TI</h1>
+          <button
+            className="tv-fullscreen-btn"
+            onClick={toggleFullscreen}
+            title={isFullscreen ? 'Sair do modo tela cheia' : 'Entrar em modo tela cheia'}
+          >
+            {isFullscreen ? '\uD83D\uDDD7' : '\u26F6'}
+          </button>
         </div>
-        
-        <button 
-          className="tv-fullscreen-btn" 
-          onClick={toggleFullscreen}
-          title={isFullscreen ? 'Sair do modo tela cheia' : 'Entrar em modo tela cheia'}
-        >
-          {isFullscreen ? '🗙' : '⛶'}
-        </button>
+
+        <div className="tv-stats-row">
+          <div className="tv-stat-card">
+            <div className="tv-stat-icon">{'\uD83D\uDE80'}</div>
+            <div className="tv-stat-value">{marcosAprovados.length}</div>
+            <div className="tv-stat-label">Total de Entregas</div>
+          </div>
+        </div>
       </div>
 
       <div className="tv-content">
         {marcosAprovados.length === 0 ? (
           <div className="tv-empty-state">
-            <div className="tv-empty-icon">📅</div>
+            <div className="tv-empty-icon">{'\uD83D\uDCC5'}</div>
             <h2>Nenhuma entrega encontrada</h2>
-            <p>Não há entregas aprovadas para exibir.</p>
+            <p>Nao ha entregas aprovadas para exibir.</p>
           </div>
         ) : (
           <>
             <div className="tv-cards">
-          {currentMarcos.map((marco, index) => (
-            <div 
-              key={marco.id} 
-              className={`tv-card ${marco.highlighted ? 'tv-card-highlighted' : ''}`}
-              style={{ animationDelay: `${index * 0.2}s` }}
-            >
-              {marco.highlighted && (
-                <div className="tv-star">⭐</div>
-              )}
-              
-              <div className="tv-card-header">
-                <div 
-                  className="tv-type-badge" 
-                  style={{ backgroundColor: getTypeColor(marco.typeId) }}
+              {currentMarcos.map((marco, index) => (
+                <div
+                  key={marco.id}
+                  className={`tv-card ${marco.highlighted ? 'tv-card-highlighted' : ''}`}
+                  style={{ animationDelay: `${index * 0.2}s` }}
                 >
-                  {getTypeIcon(marco.typeId)} {getTypeLabel(marco.typeId)}
-                </div>
-                <div className="tv-date">{formatarData(marco.data)}</div>
-              </div>
+                  {marco.highlighted && <div className="tv-star">{'\u2B50'}</div>}
 
-              <h2 className="tv-title">{marco.titulo}</h2>
-              
-              <p className="tv-description">{truncarTexto(marco.highlights || marco.descricao, 200)}</p>
+                  <div className="tv-card-header">
+                    <div className="tv-type-badge" style={{ backgroundColor: getTypeColor(marco.typeId) }}>
+                      {getTypeIcon(marco.typeId)} {getTypeLabel(marco.typeId)}
+                    </div>
+                    <div className="tv-date">{formatarData(marco.data)}</div>
+                  </div>
 
-              {marco.squads && (
-                <div className="tv-squads">
-                  <span className="tv-squads-label">👥 Squad:</span>
-                  <span className="tv-squads-value">{marco.squads}</span>
+                  <h2 className="tv-title">{marco.titulo}</h2>
+
+                  <p className="tv-description">{truncarTexto(marco.highlights || marco.descricao, 200)}</p>
+
+                  {marco.squads && (
+                    <div className="tv-squads">
+                      <span className="tv-squads-label">{'\uD83D\uDC65'} Squad:</span>
+                      <span className="tv-squads-value">{marco.squads}</span>
+                    </div>
+                  )}
                 </div>
-              )}
+              ))}
             </div>
-          ))}
-        </div>
           </>
         )}
       </div>

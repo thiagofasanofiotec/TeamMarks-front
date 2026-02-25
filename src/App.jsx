@@ -14,7 +14,6 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import PrivateRoute from './components/PrivateRoute'
 import './App.css'
 
-// VariÃ¡vel global para acessar o confirm e alert
 export let showConfirm
 export let showAlert
 
@@ -29,14 +28,14 @@ function AppLayout() {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 300)
     }
-    
+
     const handleTimelineViewChange = (event) => {
       setIsTimelineView(event.detail.view === 'timeline')
     }
-    
+
     window.addEventListener('scroll', handleScroll)
     window.addEventListener('timelineViewChange', handleTimelineViewChange)
-    
+
     return () => {
       window.removeEventListener('scroll', handleScroll)
       window.removeEventListener('timelineViewChange', handleTimelineViewChange)
@@ -48,8 +47,6 @@ function AppLayout() {
     navigate('/login')
   }
 
-  const isAprovador = user?.roleId === 'Aprovador'
-  const isContribuidor = user?.roleId === 'Contribuidor'
   const isRootRoute = location.pathname === '/'
 
   return (
@@ -62,37 +59,14 @@ function AppLayout() {
               <Link to="/">Timeline Web</Link>
               <Link to="/timeline-tv">Timeline TV</Link>
               <Link to="/estatisticas">Estatísticas</Link>
-              <Link to="/insights-tia">Insights TI.A</Link>
-              <Link to="/admin">Administração</Link>
-            </div>
-            <div className="nav-right">
-              <Link
-                to="/novo-marco"
-                className="btn-nova-entrega"
-                style={{
-                  background: '#15803d', // Verde 50% mais escuro
-                  color: '#fff',
-                  border: '1px solid #15803d',
-                  borderRadius: '4px',
-                  fontWeight: 600,
-                  fontSize: '0.95rem',
-                  padding: '0.5rem 1.25rem',
-                  transition: 'all 0.2s',
-                  boxShadow: '0 2px 8px rgba(21,128,61,0.08)',
-                  cursor: 'pointer',
-                  textDecoration: 'none',
-                  marginLeft: 'auto',
-                  display: 'inline-block'
-                }}
-              >
-                Nova Entrega
-              </Link>
+              <Link to="/insights-tia">Insights T.IA</Link>
+              {user?.roleId === 'Admin' && <Link to="/admin">Administração</Link>}
             </div>
           </nav>
           {user && (
             <div className="user-menu">
               <span className="user-name">{user.name || user.email}</span>
-              <span className="user-role">{isAprovador ? 'Aprovador' : 'Contribuidor'}</span>
+              <span className="user-role-badge">{user.roleId}</span>
               <button onClick={handleLogout} className="btn-logout">Sair</button>
             </div>
           )}
@@ -102,11 +76,11 @@ function AppLayout() {
         <Routes>
           <Route path="/" element={<Timeline />} />
           <Route path="/timeline-tv" element={<TimelineTV />} />
-          <Route path="/novo-marco" element={<MarcoForm />} />
-          <Route path="/editar-marco/:id" element={<MarcoForm />} />
-          <Route path="/admin" element={<Admin />} />
+          <Route path="/novo-marco" element={<PrivateRoute requiredRole="Admin"><MarcoForm /></PrivateRoute>} />
+          <Route path="/editar-marco/:id" element={<PrivateRoute requiredRole="Admin"><MarcoForm /></PrivateRoute>} />
+          <Route path="/admin" element={<PrivateRoute requiredRole="Admin"><Admin /></PrivateRoute>} />
           <Route path="/estatisticas" element={<Estatisticas />} />
-           <Route path="/insights-tia" element={<InsightsTIA />} />
+          <Route path="/insights-tia" element={<InsightsTIA />} />
         </Routes>
       </main>
     </div>
@@ -143,5 +117,3 @@ function App() {
 }
 
 export default App
-
-

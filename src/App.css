@@ -113,6 +113,32 @@
   border-color: #1d4ed8;
 }
 
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.user-name {
+  color: #334155;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.user-role-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 .app-header nav a {
   text-decoration: none;
   color: #4a5568;

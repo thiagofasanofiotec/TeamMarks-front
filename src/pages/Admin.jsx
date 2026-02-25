@@ -1,16 +1,14 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { useMarcosContext } from '../context/MarcosContext'
-import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { showConfirm, showAlert } from '../App'
 import api from '../services/api'
 import './Admin.css'
 
 function Admin() {
-  const { marcos, loading, error, editarMarco, excluirMarco, carregarMarcos } = useMarcosContext()
-  const { user } = useAuth()
+  const { marcos, loading, error, excluirMarco, carregarMarcos } = useMarcosContext()
   const navigate = useNavigate()
-  const [filtroStatus, setFiltroStatus] = useState('1') // 1: Pendentes por padrão
+  const [filtroStatus, setFiltroStatus] = useState('1')
   const [processando, setProcessando] = useState(null)
   const [buscaTitulo, setBuscaTitulo] = useState('')
   const [filtroAno, setFiltroAno] = useState('')
@@ -23,12 +21,12 @@ function Admin() {
   const limparHTML = (html) => {
     if (!html) return ''
     return html
-      .replace(/<[^>]*>/g, '') // Remove todas as tags HTML
-      .replace(/&nbsp;/g, ' ') // Substitui &nbsp; por espaço
-      .replace(/&amp;/g, '&') // Substitui &amp; por &
-      .replace(/&lt;/g, '<') // Substitui &lt; por <
-      .replace(/&gt;/g, '>') // Substitui &gt; por >
-      .replace(/&quot;/g, '"') // Substitui &quot; por "
+      .replace(/<[^>]*>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
       .trim()
   }
 
@@ -53,7 +51,7 @@ function Admin() {
   const getTypeIcon = (typeId) => {
     const icons = {
       1: '🖥️',
-      2: '⚙️',
+      2: '🛠️',
       3: '🔒'
     }
     return icons[typeId] || '📌'
@@ -160,57 +158,51 @@ function Admin() {
 
   const formatarData = (data) => {
     const date = new Date(data + 'T00:00:00')
-    return date.toLocaleDateString('pt-BR', { 
-      day: '2-digit', 
-      month: 'long', 
-      year: 'numeric' 
+    return date.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
     })
   }
 
-  // Extrai anos únicos
   const anosDisponiveis = [...new Set(
     marcos
-      .filter(m => m.data)
-      .map(m => m.data.split('-')[0])
+      .filter((m) => m.data)
+      .map((m) => m.data.split('-')[0])
   )].sort((a, b) => b - a)
 
-  const marcosFiltrados = marcos.filter(m => {
-    // Filtro por status
+  const marcosFiltrados = marcos.filter((m) => {
     if (filtroStatus !== 'todos' && m.statusId !== parseInt(filtroStatus)) {
       return false
     }
-    
-    // Filtro por título
+
     if (buscaTitulo) {
       if (!m.titulo) return false
       const tituloNormalizado = m.titulo.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
       const buscaNormalizada = buscaTitulo.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-      console.log('Buscando:', buscaNormalizada, 'em:', tituloNormalizado, 'Match:', tituloNormalizado.includes(buscaNormalizada))
       if (!tituloNormalizado.includes(buscaNormalizada)) {
         return false
       }
     }
-    
-    // Filtro por ano
+
     if (filtroAno && m.data && !m.data.startsWith(filtroAno)) {
       return false
     }
-    
-    // Filtro por mês
+
     if (filtroMes && m.data) {
       const mesMarco = m.data.split('-')[1]
       if (mesMarco !== filtroMes) {
         return false
       }
     }
-    
+
     return true
   })
 
   const contadores = {
-    pendentes: marcos.filter(m => m.statusId === 1).length,
-    aprovados: marcos.filter(m => m.statusId === 2).length,
-    rejeitados: marcos.filter(m => m.statusId === 3).length
+    pendentes: marcos.filter((m) => m.statusId === 1).length,
+    aprovados: marcos.filter((m) => m.statusId === 2).length,
+    rejeitados: marcos.filter((m) => m.statusId === 3).length
   }
 
   return (
@@ -219,27 +211,21 @@ function Admin() {
         <div>
           <h2>Administração de Entregas</h2>
         </div>
+        <button className="btn-novo-marco" onClick={() => navigate('/novo-marco')}>
+          Nova Entrega
+        </button>
       </div>
 
       <div className="admin-stats">
-        <div 
-          className={`stat-card pendente ${filtroStatus === '1' ? 'active' : ''}`}
-          onClick={() => setFiltroStatus('1')}
-        >
+        <div className={`stat-card pendente ${filtroStatus === '1' ? 'active' : ''}`} onClick={() => setFiltroStatus('1')}>
           <span className="stat-number">{contadores.pendentes}</span>
           <span className="stat-label">Pendentes</span>
         </div>
-        <div 
-          className={`stat-card aprovado ${filtroStatus === '2' ? 'active' : ''}`}
-          onClick={() => setFiltroStatus('2')}
-        >
+        <div className={`stat-card aprovado ${filtroStatus === '2' ? 'active' : ''}`} onClick={() => setFiltroStatus('2')}>
           <span className="stat-number">{contadores.aprovados}</span>
           <span className="stat-label">Aprovados</span>
         </div>
-        <div 
-          className={`stat-card rejeitado ${filtroStatus === '3' ? 'active' : ''}`}
-          onClick={() => setFiltroStatus('3')}
-        >
+        <div className={`stat-card rejeitado ${filtroStatus === '3' ? 'active' : ''}`} onClick={() => setFiltroStatus('3')}>
           <span className="stat-number">{contadores.rejeitados}</span>
           <span className="stat-label">Rejeitados</span>
         </div>
@@ -249,29 +235,21 @@ function Admin() {
         <div className="filter-search">
           <input
             type="text"
-            placeholder="🔍 Buscar por título..."
+            placeholder="Buscar por título..."
             value={buscaTitulo}
             onChange={(e) => setBuscaTitulo(e.target.value)}
             className="search-input"
           />
         </div>
         <div className="filter-selects">
-          <select 
-            value={filtroAno} 
-            onChange={(e) => setFiltroAno(e.target.value)}
-            className="filter-select"
-          >
-            <option value="">📅 Todos os anos</option>
-            {anosDisponiveis.map(ano => (
+          <select value={filtroAno} onChange={(e) => setFiltroAno(e.target.value)} className="filter-select">
+            <option value="">Todos os anos</option>
+            {anosDisponiveis.map((ano) => (
               <option key={ano} value={ano}>{ano}</option>
             ))}
           </select>
-          <select 
-            value={filtroMes} 
-            onChange={(e) => setFiltroMes(e.target.value)}
-            className="filter-select"
-          >
-            <option value="">📆 Todos os meses</option>
+          <select value={filtroMes} onChange={(e) => setFiltroMes(e.target.value)} className="filter-select">
+            <option value="">Todos os meses</option>
             <option value="01">Janeiro</option>
             <option value="02">Fevereiro</option>
             <option value="03">Março</option>
@@ -286,7 +264,7 @@ function Admin() {
             <option value="12">Dezembro</option>
           </select>
           {(buscaTitulo || filtroAno || filtroMes) && (
-            <button 
+            <button
               className="clear-filters-btn"
               onClick={() => {
                 setBuscaTitulo('')
@@ -295,7 +273,7 @@ function Admin() {
               }}
               title="Limpar filtros"
             >
-              ✕ Limpar
+              Limpar
             </button>
           )}
         </div>
@@ -310,7 +288,7 @@ function Admin() {
             <p>Nenhuma entrega encontrada com este status.</p>
           </div>
         ) : (
-          marcosFiltrados.map(marco => (
+          marcosFiltrados.map((marco) => (
             <div key={marco.id} className="admin-card">
               <div className="admin-card-header">
                 <div>
@@ -319,78 +297,51 @@ function Admin() {
                     <span className={`status-badge ${getStatusClass(marco.statusId)}`}>
                       {getStatusLabel(marco.statusId)}
                     </span>
-                    <span className="type-badge" style={{ 
-                      backgroundColor: marco.typeId === 1 ? '#2563eb' : marco.typeId === 2 ? '#059669' : '#dc2626' 
-                    }}>
+                    <span
+                      className="type-badge"
+                      style={{ backgroundColor: marco.typeId === 1 ? '#2563eb' : marco.typeId === 2 ? '#059669' : '#dc2626' }}
+                    >
                       {getTypeIcon(marco.typeId)} {getTypeLabel(marco.typeId)}
                     </span>
                   </div>
                 </div>
                 <span className="card-date">{formatarData(marco.data)}</span>
               </div>
-              
-              {/* <p className="card-description" style={{ whiteSpace: 'pre-wrap' }}>{limparHTML(marco.descricao)}</p> */}
-              
-              {/* {marco.highlights && (
-                <div className="card-highlights">
-                  <strong>Destaques:</strong> <span style={{ whiteSpace: 'pre-wrap' }}>{limparHTML(marco.highlights)}</span>
-                </div>
-              )} */}
-              
+
               <div className="card-footer">
                 <div className="card-info">
                   {marco.squads && marco.squads.trim() && (
                     <div className="card-squads">
-                      <span className="squads-label">👥 Squads:</span>
+                      <span className="squads-label">Squads:</span>
                       {marco.squads.split(',').map((squad, index) => (
                         <span key={index} className="squad-tag">{squad.trim()}</span>
                       ))}
                     </div>
                   )}
                 </div>
-                
+
                 <div className="card-actions">
-                  {/* Botão de Editar visível para pendentes e aprovados */}
                   {(marco.statusId === 1 || marco.statusId === 2) && (
-                    <button 
-                      onClick={() => handleEditar(marco.id)}
-                      className="btn-editar-admin"
-                      disabled={processando === marco.id}
-                    >
-                      ✏️ Editar
+                    <button onClick={() => handleEditar(marco.id)} className="btn-editar-admin" disabled={processando === marco.id}>
+                      Editar
                     </button>
                   )}
-                  
-                  {/* Botão de Excluir visível apenas para rejeitados */}
+
                   {marco.statusId === 3 && (
-                    <button 
-                      onClick={() => handleExcluir(marco)}
-                      className="btn-excluir-admin"
-                      disabled={processando === marco.id}
-                    >
-                      {processando === marco.id ? 'Excluindo...' : '🗑️ Excluir'}
+                    <button onClick={() => handleExcluir(marco)} className="btn-excluir-admin" disabled={processando === marco.id}>
+                      {processando === marco.id ? 'Excluindo...' : 'Excluir'}
                     </button>
                   )}
-                  
-                  {/* Botão de Aprovar para pendentes e rejeitados */}
+
                   {(marco.statusId === 1 || marco.statusId === 3) && (
-                    <button 
-                      onClick={() => handleAprovar(marco)}
-                      className="btn-aprovar"
-                      disabled={processando === marco.id}
-                    >
-                      {processando === marco.id ? 'Processando...' : '✓ Aprovar'}
+                    <button onClick={() => handleAprovar(marco)} className="btn-aprovar" disabled={processando === marco.id}>
+                      {processando === marco.id ? 'Processando...' : 'Aprovar'}
                     </button>
                   )}
-                  
-                  {/* Botão de Rejeitar para pendentes e aprovados */}
+
                   {(marco.statusId === 1 || marco.statusId === 2) && (
-                    <button 
-                      onClick={() => handleRejeitar(marco)}
-                      className="btn-rejeitar"
-                      disabled={processando === marco.id}
-                    >
-                      {processando === marco.id ? 'Processando...' : '✗ Rejeitar'}
+                    <button onClick={() => handleRejeitar(marco)} className="btn-rejeitar" disabled={processando === marco.id}>
+                      {processando === marco.id ? 'Processando...' : 'Rejeitar'}
                     </button>
                   )}
                 </div>

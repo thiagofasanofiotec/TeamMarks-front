@@ -1,6 +1,6 @@
-.timeline-tv {
+﻿.timeline-tv {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #38bdf8 100%);
   padding: 2rem;
   display: flex;
   flex-direction: column;
@@ -8,22 +8,34 @@
 }
 
 .tv-header {
-  text-align: center;
+  text-align: left;
   margin-bottom: 1.5rem;
   color: white;
+}
+
+.tv-header-top {
   position: relative;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.tv-stats-row {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
 }
 
 .tv-fullscreen-btn {
-  position: absolute;
-  top: 0;
-  right: 2rem;
+  position: static;
   background: rgba(255, 255, 255, 0.2);
   border: 2px solid rgba(255, 255, 255, 0.4);
   color: white;
-  font-size: 2rem;
-  width: 60px;
-  height: 60px;
+  font-size: 1.6rem;
+  width: 52px;
+  height: 52px;
   border-radius: 12px;
   cursor: pointer;
   backdrop-filter: blur(10px);
@@ -44,8 +56,11 @@
 
 .tv-header h1 {
   font-size: 3rem;
-  margin-bottom: 1.5rem;
+  margin: 0;
   text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .tv-info-text {
@@ -58,10 +73,10 @@
 
 .tv-controls {
   display: flex;
-  gap: 2rem;
-  justify-content: center;
+  gap: 1rem;
+  justify-content: flex-end;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .tv-stats-container {
@@ -262,7 +277,6 @@
   opacity: 0.8;
 }
 
-/* Responsivo */
 @media (max-width: 1400px) {
   .tv-cards {
     grid-template-columns: repeat(2, 1fr);

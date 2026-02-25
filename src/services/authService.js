@@ -1,25 +1,43 @@
-import api from './api'
+﻿import axios from 'axios'
+
+const SEG_API_BASE = 'https://api.fiotec.org.br/SegAPI'
 
 export const authService = {
-  sendCode: async (email) => {
-    const response = await api.post('/Login/email', {email: email}, {
-      headers: {
-        'Content-Type': 'application/json'
+  authenticate: async (login, senha) => {
+    const response = await axios.post(
+      `${SEG_API_BASE}/login/auth`,
+      { login, senha },
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        }
       }
-    })
+    )
+
     return response.data
   },
 
-  validateCode: async (email, codeHash) => {
-    const response = await api.post('/Login/validate', {
-      email,
-      codeHash
-    })
+  verifyAccess: async (idUsuario, jwt) => {
+    const response = await axios.post(
+      `${SEG_API_BASE}/access/verify`,
+      {
+        IdUsuario: idUsuario,
+        IdSistema: 42
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${jwt}`
+        }
+      }
+    )
+
     return response.data
   },
 
   logout: () => {
     localStorage.removeItem('user')
+    localStorage.removeItem('token')
   },
 
   getCurrentUser: () => {
