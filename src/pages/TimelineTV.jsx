@@ -1,4 +1,4 @@
-ï»¿import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useMarcosContext } from '../context/MarcosContext'
 import './TimelineTV.css'
 
@@ -20,7 +20,7 @@ function TimelineTV() {
     if (!dataString) return ''
     const [ano, mes, dia] = dataString.split('-')
     const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
-    return `${dia} ${meses[parseInt(mes) - 1]} ${ano}`
+    return `${dia} ${meses[parseInt(mes, 10) - 1]} ${ano}`
   }
 
   const limparHTML = (html) => {
@@ -39,8 +39,34 @@ function TimelineTV() {
     if (!texto) return ''
     const textoLimpo = limparHTML(texto)
     if (textoLimpo.length <= limite) return textoLimpo
-    return textoLimpo.substring(0, limite) + '...'
+    return `${textoLimpo.substring(0, limite)}...`
   }
+
+  const getHighlightItems = (highlights) => {
+    if (!highlights) return []
+
+    const itemsFromHtmlList = [...highlights.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/gi)]
+      .map((match) => limparHTML(match[1]))
+      .filter(Boolean)
+
+    if (itemsFromHtmlList.length > 0) return itemsFromHtmlList
+
+    const normalized = limparHTML(highlights)
+    const itemsFromText = normalized
+      .split(/\r?\n+|\s+[•??]\s+|\s-\s/g)
+      .map((item) => item.trim())
+      .filter(Boolean)
+
+    if (itemsFromText.length > 0) return itemsFromText
+
+    return normalized ? [normalized] : []
+  }
+
+  useEffect(() => {
+    if (currentSlide >= totalSlides && totalSlides > 0) {
+      setCurrentSlide(0)
+    }
+  }, [currentSlide, totalSlides])
 
   useEffect(() => {
     if (totalSlides > 1) {
@@ -58,6 +84,12 @@ function TimelineTV() {
 
   const startIndex = currentSlide * ITEMS_PER_SLIDE
   const currentMarcos = marcosAprovados.slice(startIndex, startIndex + ITEMS_PER_SLIDE)
+
+  const total = marcosAprovados.length
+  const sistemas = marcosAprovados.filter((m) => m.typeId === 1).length
+  const infra = marcosAprovados.filter((m) => m.typeId === 2).length
+  const devsecops = marcosAprovados.filter((m) => m.typeId === 3).length
+  const mediaMensal = total > 0 ? Math.round(total / 12) : 0
 
   const getTypeIcon = (typeId) => {
     if (typeId === 1) return '\uD83D\uDDA5\uFE0F'
@@ -103,10 +135,10 @@ function TimelineTV() {
   }, [])
 
   return (
-    <div className="timeline-tv" ref={containerRef}>
+    <div className={`timeline-tv ${isFullscreen ? 'tv-is-fullscreen' : ''}`} ref={containerRef}>
       <div className="tv-header">
         <div className="tv-header-top">
-          <h1>Timeline de Entregas TI</h1>
+          <h1>Timeline TV</h1>
           <button
             className="tv-fullscreen-btn"
             onClick={toggleFullscreen}
@@ -116,11 +148,29 @@ function TimelineTV() {
           </button>
         </div>
 
-        <div className="tv-stats-row">
-          <div className="tv-stat-card">
-            <div className="tv-stat-icon">{'\uD83D\uDE80'}</div>
-            <div className="tv-stat-value">{marcosAprovados.length}</div>
-            <div className="tv-stat-label">Total de Entregas</div>
+        <div className="tv-inline-stats tv-estatisticas-grid">
+          <div className="tv-numero-card">
+            <div className="tv-numero-valor">{total}</div>
+            <div className="tv-numero-label">Total de Entregas</div>
+          </div>
+          <div className="tv-numero-card sistemas">
+            <div className="tv-numero-valor">{sistemas}</div>
+            <div className="tv-numero-label">Sistemas</div>
+            <div className="tv-numero-percent">{total ? ((sistemas / total) * 100).toFixed(0) : 0}%</div>
+          </div>
+          <div className="tv-numero-card infra">
+            <div className="tv-numero-valor">{infra}</div>
+            <div className="tv-numero-label">Infra</div>
+            <div className="tv-numero-percent">{total ? ((infra / total) * 100).toFixed(0) : 0}%</div>
+          </div>
+          <div className="tv-numero-card devsecops">
+            <div className="tv-numero-valor">{devsecops}</div>
+            <div className="tv-numero-label">DevSecops</div>
+            <div className="tv-numero-percent">{total ? ((devsecops / total) * 100).toFixed(0) : 0}%</div>
+          </div>
+          <div className="tv-numero-card">
+            <div className="tv-numero-valor">{mediaMensal}</div>
+            <div className="tv-numero-label">Media Mensal</div>
           </div>
         </div>
       </div>
@@ -133,37 +183,50 @@ function TimelineTV() {
             <p>Nao ha entregas aprovadas para exibir.</p>
           </div>
         ) : (
-          <>
-            <div className="tv-cards">
-              {currentMarcos.map((marco, index) => (
-                <div
-                  key={marco.id}
-                  className={`tv-card ${marco.highlighted ? 'tv-card-highlighted' : ''}`}
-                  style={{ animationDelay: `${index * 0.2}s` }}
-                >
-                  {marco.highlighted && <div className="tv-star">{'\u2B50'}</div>}
+          <div className="tv-cards">
+            {currentMarcos.map((marco, index) => (
+              <div
+                key={marco.id}
+                className={`tv-card ${marco.highlighted ? 'tv-card-highlighted' : ''}`}
+                style={{ animationDelay: `${index * 0.2}s` }}
+              >
+                {marco.highlighted && <div className="tv-star">{'\u2B50'}</div>}
 
-                  <div className="tv-card-header">
-                    <div className="tv-type-badge" style={{ backgroundColor: getTypeColor(marco.typeId) }}>
-                      {getTypeIcon(marco.typeId)} {getTypeLabel(marco.typeId)}
-                    </div>
-                    <div className="tv-date">{formatarData(marco.data)}</div>
+                <div className="tv-card-header">
+                  <div className="tv-type-badge" style={{ backgroundColor: getTypeColor(marco.typeId) }}>
+                    {getTypeIcon(marco.typeId)} {getTypeLabel(marco.typeId)}
                   </div>
-
-                  <h2 className="tv-title">{marco.titulo}</h2>
-
-                  <p className="tv-description">{truncarTexto(marco.highlights || marco.descricao, 200)}</p>
-
-                  {marco.squads && (
-                    <div className="tv-squads">
-                      <span className="tv-squads-label">{'\uD83D\uDC65'} Squad:</span>
-                      <span className="tv-squads-value">{marco.squads}</span>
-                    </div>
-                  )}
+                  <div className="tv-date">{formatarData(marco.data)}</div>
                 </div>
-              ))}
-            </div>
-          </>
+
+                <h2 className="tv-title">{marco.titulo}</h2>
+
+                <p className="tv-description">{truncarTexto(marco.highlights || marco.descricao, 200)}</p>
+
+                {isFullscreen && marco.highlights && (
+                  <div className="tv-highlights">
+                    <span className="tv-highlights-label">Destaques:</span>
+                    <ul className="tv-highlights-list">
+                      {getHighlightItems(marco.highlights)
+                        .slice(0, 4)
+                        .map((item, itemIndex) => (
+                          <li key={`${marco.id}-highlight-${itemIndex}`} className="tv-highlights-item">
+                            {truncarTexto(item, 120)}
+                          </li>
+                        ))}
+                    </ul>
+                  </div>
+                )}
+
+                {marco.squads && (
+                  <div className="tv-squads">
+                    <span className="tv-squads-label">{'\uD83D\uDC65'} Squad:</span>
+                    <span className="tv-squads-value">{marco.squads}</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>
@@ -171,3 +234,5 @@ function TimelineTV() {
 }
 
 export default TimelineTV
+
+
