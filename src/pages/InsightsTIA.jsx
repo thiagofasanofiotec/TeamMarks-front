@@ -177,9 +177,9 @@ export default function InsightsTIA() {
           line-height: 1.35;
         }
         .insights-summary-card {
-          background: #ecfeff;
-          border: 1px solid #99f6e4;
-          border-left: 4px solid #0d9488;
+          background: #f5f3ff;
+          border: 1px solid #ddd6fe;
+          border-left: 4px solid #7c3aed;
           border-radius: 12px;
           padding: 1rem;
         }
@@ -203,6 +203,11 @@ export default function InsightsTIA() {
           border-radius: 12px;
           padding: 0.95rem;
         }
+        .insights-list-grid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 0.8rem;
+        }
         .insights-chip-grid {
           display: flex;
           flex-direction: column;
@@ -217,17 +222,23 @@ export default function InsightsTIA() {
         .insights-chip-grid-blue .insights-chip-item {
           background: #eff6ff;
           color: #1d4ed8;
-          border: 1px solid #bfdbfe;        }
+          border: 1px solid #bfdbfe;
+        }
         .insights-chip-grid-green .insights-chip-item {
-          background: #eff6ff;
-          color: #1d4ed8;
-          border: 1px solid #bfdbfe;        }
+          background: #ecfdf5;
+          color: #047857;
+          border: 1px solid #a7f3d0;
+        }
         .insights-chip-grid-amber .insights-chip-item {
-          background: #eff6ff;
-          color: #1d4ed8;
-          border: 1px solid #bfdbfe;        }
+          background: #fffbeb;
+          color: #b45309;
+          border: 1px solid #fcd34d;
+        }
         @media (max-width: 860px) {
           .insights-kpi-grid {
+            grid-template-columns: 1fr;
+          }
+          .insights-list-grid {
             grid-template-columns: 1fr;
           }
         }
@@ -306,19 +317,21 @@ export default function InsightsTIA() {
                   <p className="insights-summary-text">{summaryObj.resumoGeral}</p>
                 </div>
 
-                <div className="insights-list-card">
-                  <h5 className="insights-section-title"><span aria-hidden="true">{'\uD83C\uDFAF'}</span> Principais temas</h5>
-                  <InfoChips items={summaryObj.topTemas || []} variant="blue" />
-                </div>
+                <div className="insights-list-grid">
+                  <div className="insights-list-card">
+                    <h5 className="insights-section-title"><span aria-hidden="true">{'\uD83C\uDFAF'}</span> Principais temas</h5>
+                    <InfoChips items={summaryObj.topTemas || []} variant="blue" />
+                  </div>
 
-                <div className="insights-list-card">
-                  <h5 className="insights-section-title"><span aria-hidden="true">{'\uD83D\uDC65'}</span> Areas mais atendidas</h5>
-                  <InfoChips items={summaryObj.topAreasAtendidas || []} variant="green" />
-                </div>
+                  <div className="insights-list-card">
+                    <h5 className="insights-section-title"><span aria-hidden="true">{'\uD83D\uDC65'}</span> Areas mais atendidas</h5>
+                    <InfoChips items={summaryObj.topAreasAtendidas || []} variant="green" />
+                  </div>
 
-                <div className="insights-list-card">
-                  <h5 className="insights-section-title"><span aria-hidden="true">{'\uD83E\uDD47'}</span> Ganhos percebidos</h5>
-                  <InfoChips items={summaryObj.ganhosPercebidos || []} variant="amber" />
+                  <div className="insights-list-card">
+                    <h5 className="insights-section-title"><span aria-hidden="true">{'\uD83E\uDD47'}</span> Ganhos percebidos</h5>
+                    <InfoChips items={summaryObj.ganhosPercebidos || []} variant="amber" />
+                  </div>
                 </div>
               </>
             ) : (
@@ -338,9 +351,6 @@ export default function InsightsTIA() {
     </div>
   )
 }
-
-
-
 
 
 

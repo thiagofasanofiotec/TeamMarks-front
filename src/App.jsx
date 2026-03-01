@@ -56,8 +56,8 @@ function AppLayout() {
           <h1>Observatório TI</h1>
           <nav>
             <div className="nav-left">
-              <Link to="/">Timeline Web</Link>
-              <Link to="/timeline-tv">Timeline TV</Link>
+              <Link to="/">Timeline</Link>
+              <Link to="/timeline-tv">TV</Link>
               <Link to="/estatisticas">Estatísticas</Link>
               <Link to="/insights-tia">Insights T.IA</Link>
               {user?.roleId === 'Admin' && <Link to="/admin">Administração</Link>}
