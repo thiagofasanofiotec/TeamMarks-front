@@ -53,7 +53,7 @@ function TimelineTV() {
 
     const normalized = limparHTML(highlights)
     const itemsFromText = normalized
-      .split(/\r?\n+|\s+[•??]\s+|\s-\s/g)
+      .split(/\r?\n+|\s+[ï¿½??]\s+|\s-\s/g)
       .map((item) => item.trim())
       .filter(Boolean)
 
@@ -138,7 +138,7 @@ function TimelineTV() {
     <div className={`timeline-tv ${isFullscreen ? 'tv-is-fullscreen' : ''}`} ref={containerRef}>
       <div className="tv-header">
         <div className="tv-header-top">
-          <h1>Timeline TV</h1>
+          <h1>TI TV</h1>
           <button
             className="tv-fullscreen-btn"
             onClick={toggleFullscreen}

@@ -252,7 +252,6 @@ function Timeline() {
             <>
               {mesesDisponiveis.length > 1 && isScrolled && (
                 <div className="month-navigation">
-                  <div className="month-navigation-title">Navegar por mês:</div>
                   <div className="month-navigation-buttons">
                     {mesesDisponiveis.map((mes) => (
                       <button

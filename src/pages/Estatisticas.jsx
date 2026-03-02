@@ -164,7 +164,7 @@ export default function Estatisticas() {
         </div>
       </div>
       <div className="grafico-section">
-        <h4>🎯 Sistemas Mais Impactados (Top 10)</h4>
+        <h4>🎯 Sistemas mais impactados (Top 10)</h4>
         <div className="grafico-container">
           <ResponsiveContainer width="100%" height={400}>
             <BarChart
